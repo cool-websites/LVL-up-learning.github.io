@@ -1718,7 +1718,8 @@ motocrossx3m: {
             const SPEED_INIT = 5;
             let speed = SPEED_INIT;
 
-            const player = { x: 120, y: GROUND_Y, w: 36, h: 36, vy: 0, onGround: true, rotation: 0, dead: false };
+            // Player y is the TOP of the cube. Starts sitting on ground.
+            const player = { x: 120, y: GROUND_Y - 36, w: 36, h: 36, vy: 0, onGround: true, rotation: 0, dead: false };
             const GRAVITY = 0.55;
             const JUMP_FORCE = -12.5;
 
@@ -1740,7 +1741,7 @@ motocrossx3m: {
                     items.push({ type: 'spike', x: baseX, y: GROUND_Y });
                 } else if (roll < 0.55) {
                     items.push({ type: 'spike', x: baseX, y: GROUND_Y });
-                    items.push({ type: 'spike', x: baseX + TILE * 0.7, y: GROUND_Y });
+                    items.push({ type: 'spike', x: baseX + TILE * 0.8, y: GROUND_Y });
                 } else if (roll < 0.75) {
                     items.push({ type: 'block', x: baseX, y: GROUND_Y - TILE, w: TILE, h: TILE });
                     items.push({ type: 'spike', x: baseX + TILE, y: GROUND_Y });
@@ -1809,15 +1810,15 @@ motocrossx3m: {
                     ctx.fillStyle = `rgba(255,255,255,${0.3 + s.r * 0.2})`; ctx.fill();
                 });
 
-                // Ground
+                // Ground — drawn at GROUND_Y which is the surface
                 ctx.fillStyle = `hsl(${bgHue},70%,30%)`;
-                ctx.fillRect(0, GROUND_Y + 36, canvas.width, canvas.height - GROUND_Y - 36);
+                ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
                 ctx.shadowBlur = 12; ctx.shadowColor = `hsl(${bgHue},90%,60%)`;
-                ctx.fillStyle = `hsl(${bgHue},90%,60%)`; ctx.fillRect(0, GROUND_Y + 36, canvas.width, 3); ctx.shadowBlur = 0;
+                ctx.fillStyle = `hsl(${bgHue},90%,60%)`; ctx.fillRect(0, GROUND_Y, canvas.width, 3); ctx.shadowBlur = 0;
 
                 const gridOff = (frameCount * speed) % 80;
                 ctx.strokeStyle = `hsla(${bgHue},60%,50%,0.2)`; ctx.lineWidth = 1;
-                for (let gx = -gridOff; gx < canvas.width; gx += 80) { ctx.beginPath(); ctx.moveTo(gx, GROUND_Y + 36); ctx.lineTo(gx, canvas.height); ctx.stroke(); }
+                for (let gx = -gridOff; gx < canvas.width; gx += 80) { ctx.beginPath(); ctx.moveTo(gx, GROUND_Y); ctx.lineTo(gx, canvas.height); ctx.stroke(); }
 
                 // Spawn obstacles
                 nextObstacleX -= speed;
@@ -1842,22 +1843,64 @@ motocrossx3m: {
                 });
 
                 if (!player.dead) {
-                    player.vy += GRAVITY; player.y += player.vy; player.rotation += 4 * (speed / SPEED_INIT);
-                    if (player.y >= GROUND_Y) { player.y = GROUND_Y; player.vy = 0; player.onGround = true; player.rotation = Math.round(player.rotation / 90) * 90; }
+                    // 1. Apply gravity and move
+                    player.vy += GRAVITY;
+                    player.y += player.vy;
 
-                    obstacles.forEach(o => {
-                        let hit = false;
+                    // 2. Snap to ground
+                    if (player.y + player.h >= GROUND_Y) {
+                        player.y = GROUND_Y - player.h;
+                        player.vy = 0;
+                        player.onGround = true;
+                        player.rotation = Math.round(player.rotation / 90) * 90;
+                    } else {
+                        player.onGround = false;
+                    }
+
+                    // 3. Rotate only while airborne
+                    if (!player.onGround) player.rotation += 4 * (speed / SPEED_INIT);
+
+                    // 4. Collision with obstacles
+                    for (const o of obstacles) {
                         const shrink = 5;
+                        const px = player.x + shrink;
+                        const py = player.y + shrink;
+                        const pw = player.w - shrink * 2;
+                        const ph = player.h - shrink * 2;
+
                         if (o.type === 'spike') {
-                            if (rectOverlap(player.x + shrink, player.y + shrink, player.w - shrink * 2, player.h - shrink * 2, o.x + shrink, o.y - TILE * 0.8, TILE - shrink * 2, TILE * 0.8)) hit = true;
+                            // Spike triangle: base at o.y, tip at o.y - TILE*0.8
+                            // Use a conservative inner rect for the triangle hitbox
+                            const tx = o.x + TILE * 0.25;
+                            const ty = o.y - TILE * 0.72;
+                            const tw = TILE * 0.5;
+                            const th = TILE * 0.72;
+                            if (rectOverlap(px, py, pw, ph, tx, ty, tw, th)) {
+                                if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { running = false; window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); cancelAnimationFrame(animId); onGameOver(Math.floor(score)); } }, 600); }
+                            }
                         } else {
-                            if (rectOverlap(player.x + shrink, player.y + shrink, player.w - shrink * 2, player.h - shrink * 2, o.x, o.y, o.w, o.h)) hit = true;
+                            // Block: kill on any overlap EXCEPT pure top-landing
+                            // Top-landing is handled separately below — here we only check side/front hit
+                            if (rectOverlap(px, py, pw, ph, o.x, o.y, o.w, o.h)) {
+                                // Check if player is landing on top (coming from above)
+                                const playerBottom = player.y + player.h;
+                                const prevBottom = playerBottom - player.vy;
+                                const landingOnTop = prevBottom <= o.y + 2 && player.x + player.w - shrink > o.x + 2 && player.x + shrink < o.x + o.w - 2;
+                                if (!landingOnTop) {
+                                    if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { running = false; window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); cancelAnimationFrame(animId); onGameOver(Math.floor(score)); } }, 600); }
+                                } else {
+                                    // Land on top of block
+                                    player.y = o.y - player.h;
+                                    player.vy = 0;
+                                    player.onGround = true;
+                                    player.rotation = Math.round(player.rotation / 90) * 90;
+                                }
+                            }
                         }
-                        if (hit && !player.dead) {
-                            player.dead = true; spawnDeathParticles();
-                            setTimeout(() => { running = false; window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); cancelAnimationFrame(animId); onGameOver(Math.floor(score)); }, 600);
-                        }
-                    });
+                    }
+
+                    // Rotate while airborne
+                    if (!player.onGround) player.rotation += 4 * (speed / SPEED_INIT);
 
                     ctx.save();
                     ctx.translate(player.x + player.w / 2, player.y + player.h / 2);
@@ -1874,8 +1917,10 @@ motocrossx3m: {
 
                 particles.forEach(p => {
                     p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life -= 0.03;
+                    const r = Math.max(0, 3 * p.life);
+                    if (r <= 0) return;
                     ctx.globalAlpha = Math.max(0, p.life);
-                    ctx.beginPath(); ctx.arc(p.x, p.y, 3 * p.life, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
+                    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
                 });
                 ctx.globalAlpha = 1;
                 particles = particles.filter(p => p.life > 0);
@@ -1892,7 +1937,7 @@ motocrossx3m: {
         }
     },
 
-    // ─── BATTLE ROYALE (Fortnite-style) ──────────────────────────────────────
+    // ─── BATTLE ROYALE (Fortnite-style) with Lobby ───────────────────────────
     battleRoyale: {
         title: "BATTLE ROYALE",
         type: "internal",
@@ -1902,11 +1947,170 @@ motocrossx3m: {
         init: function(canvas, ctx, onGameOver) {
             let running = true;
             let animId;
-            let frameCount = 0;
-            let kills = 0;
-            let alive = 50;
 
             const W = canvas.width, H = canvas.height;
+
+            // ── LOBBY SYSTEM ──────────────────────────────────────────────────
+            let lobbyState = 'menu'; // menu | lobby | game
+            let partyCode = '';
+            let partyMembers = [];
+            let isHost = false;
+            let myName = (window._currentUsername) || 'Player';
+            let channel = null;
+
+            const SUPABASE_URL = 'https://pzmfsbajmntwvvvxdlra.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWZzYmFqbW50d3Z2dnhkbHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTUyOTEsImV4cCI6MjA5MjEzMTI5MX0.VSX10eIB7abkAgjh1Bf3WDFfOm8vmMEqS1LVDkuopZE';
+
+            // Try to get username from the page
+            const usernameEl = document.getElementById('username-display') || document.getElementById('nav-username');
+            if (usernameEl && usernameEl.innerText && usernameEl.innerText !== 'Ghost') myName = usernameEl.innerText.trim();
+
+            function genCode() {
+                return Math.random().toString(36).substring(2, 7).toUpperCase();
+            }
+
+            function joinChannel(code) {
+                if (channel) channel.unsubscribe();
+                // Use supabase from window if available, else raw fetch for broadcast
+                const chName = `party-${code}`;
+                // Use raw Supabase Realtime via WebSocket broadcast
+                channel = { code, members: partyMembers, _ws: null };
+
+                // Broadcast via Supabase Realtime REST channel
+                const wsUrl = `wss://pzmfsbajmntwvvvxdlra.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`;
+                const ws = new WebSocket(wsUrl);
+                channel._ws = ws;
+
+                ws.onopen = () => {
+                    // Join channel
+                    ws.send(JSON.stringify({ topic: `realtime:${chName}`, event: 'phx_join', payload: {}, ref: '1' }));
+                };
+
+                ws.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.event === 'broadcast' && msg.payload?.type === 'member_update') {
+                            partyMembers = msg.payload.members || [];
+                            drawLobby();
+                        }
+                        if (msg.event === 'broadcast' && msg.payload?.type === 'start_game') {
+                            startGame();
+                        }
+                    } catch {}
+                };
+
+                ws.onerror = () => {};
+                return ws;
+            }
+
+            function broadcastMembers(ws, code) {
+                if (!ws || ws.readyState !== 1) return;
+                ws.send(JSON.stringify({
+                    topic: `realtime:party-${code}`,
+                    event: 'broadcast',
+                    payload: { type: 'member_update', members: partyMembers },
+                    ref: '2'
+                }));
+            }
+
+            function broadcastStart(ws, code) {
+                if (!ws || ws.readyState !== 1) return;
+                ws.send(JSON.stringify({
+                    topic: `realtime:party-${code}`,
+                    event: 'broadcast',
+                    payload: { type: 'start_game' },
+                    ref: '3'
+                }));
+            }
+
+            // ── LOBBY OVERLAY (HTML overlay on top of canvas) ─────────────────
+            const overlay = document.createElement('div');
+            overlay.id = 'br-lobby-overlay';
+            overlay.style.cssText = `position:absolute;inset:0;background:rgba(10,20,10,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;font-family:'Share Tech Mono',monospace;color:#f1f5f9;`;
+            canvas.parentElement.appendChild(overlay);
+
+            function drawLobby() {
+                if (lobbyState === 'menu') {
+                    overlay.innerHTML = `
+                        <div style="text-align:center;max-width:420px;width:90%;">
+                            <div style="font-size:40px;margin-bottom:8px;">🪖</div>
+                            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#4ade80;letter-spacing:2px;margin-bottom:4px;">BATTLE ROYALE</div>
+                            <div style="font-size:11px;color:#6b7280;margin-bottom:32px;letter-spacing:3px;">PLAYING AS: ${myName}</div>
+                            <button id="br-create" style="width:100%;padding:14px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:15px;font-family:'Share Tech Mono',monospace;cursor:pointer;margin-bottom:12px;letter-spacing:2px;">⚔ CREATE PARTY</button>
+                            <div style="color:#6b7280;font-size:11px;margin:12px 0;letter-spacing:2px;">─── OR JOIN ───</div>
+                            <div style="display:flex;gap:8px;">
+                                <input id="br-code-input" placeholder="ENTER CODE" maxlength="5" style="flex:1;padding:12px;background:#1a2a1a;border:1px solid #374151;border-radius:8px;color:#4ade80;font-family:'Share Tech Mono',monospace;font-size:16px;letter-spacing:4px;text-align:center;text-transform:uppercase;" />
+                                <button id="br-join" style="padding:12px 18px;background:#1e3a5f;border:none;border-radius:8px;color:#93c5fd;font-family:'Share Tech Mono',monospace;cursor:pointer;font-size:13px;letter-spacing:1px;">JOIN</button>
+                            </div>
+                            <button id="br-solo" style="width:100%;margin-top:20px;padding:12px;background:transparent;border:1px solid #374151;border-radius:10px;color:#6b7280;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;">▷ PLAY SOLO (vs bots)</button>
+                        </div>`;
+                    document.getElementById('br-create').onclick = () => {
+                        partyCode = genCode();
+                        isHost = true;
+                        partyMembers = [{ name: myName, ready: true, host: true }];
+                        const ws = joinChannel(partyCode);
+                        channel._ws = ws;
+                        lobbyState = 'lobby';
+                        setTimeout(() => { broadcastMembers(ws, partyCode); drawLobby(); }, 800);
+                    };
+                    document.getElementById('br-join').onclick = () => {
+                        const code = document.getElementById('br-code-input').value.trim().toUpperCase();
+                        if (code.length !== 5) { document.getElementById('br-code-input').style.borderColor = '#ef4444'; return; }
+                        partyCode = code;
+                        isHost = false;
+                        partyMembers = [{ name: myName, ready: true, host: false }];
+                        const ws = joinChannel(code);
+                        channel._ws = ws;
+                        lobbyState = 'lobby';
+                        setTimeout(() => { broadcastMembers(ws, partyCode); drawLobby(); }, 800);
+                    };
+                    document.getElementById('br-solo').onclick = () => { overlay.remove(); startGame(); };
+                } else if (lobbyState === 'lobby') {
+                    const memberRows = partyMembers.map(m =>
+                        `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(74,222,128,0.07);border-radius:8px;margin-bottom:6px;">
+                            <span style="font-size:18px;">${m.host ? '👑' : '🪖'}</span>
+                            <span style="flex:1;color:${m.host ? '#4ade80' : '#f1f5f9'};font-size:13px;">${m.name}</span>
+                            <span style="font-size:10px;color:#10b981;letter-spacing:2px;">READY</span>
+                        </div>`
+                    ).join('');
+                    overlay.innerHTML = `
+                        <div style="text-align:center;max-width:420px;width:90%;">
+                            <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#4ade80;margin-bottom:4px;">PARTY LOBBY</div>
+                            <div style="font-size:11px;color:#6b7280;margin-bottom:6px;letter-spacing:3px;">SHARE CODE WITH FRIENDS</div>
+                            <div style="font-size:32px;font-weight:700;color:#fbbf24;letter-spacing:10px;background:#1a2a1a;padding:14px 20px;border-radius:10px;border:1px solid #374151;margin-bottom:20px;">${partyCode}</div>
+                            <div style="font-size:11px;color:#6b7280;letter-spacing:2px;margin-bottom:10px;">PARTY (${partyMembers.length}/4)</div>
+                            <div style="margin-bottom:20px;">${memberRows}</div>
+                            ${isHost
+                                ? `<button id="br-start" style="width:100%;padding:14px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:15px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:2px;">▶ START GAME</button>`
+                                : `<div style="color:#6b7280;font-size:12px;letter-spacing:2px;padding:14px;border:1px solid #374151;border-radius:10px;">Waiting for host to start...</div>`
+                            }
+                            <button id="br-leave" style="width:100%;margin-top:10px;padding:10px;background:transparent;border:1px solid #374151;border-radius:8px;color:#6b7280;font-size:12px;font-family:'Share Tech Mono',monospace;cursor:pointer;">✕ LEAVE PARTY</button>
+                        </div>`;
+                    if (isHost) {
+                        document.getElementById('br-start').onclick = () => {
+                            broadcastStart(channel._ws, partyCode);
+                            overlay.remove();
+                            startGame();
+                        };
+                    }
+                    document.getElementById('br-leave').onclick = () => {
+                        if (channel._ws) channel._ws.close();
+                        lobbyState = 'menu';
+                        partyMembers = [];
+                        partyCode = '';
+                        drawLobby();
+                    };
+                }
+            }
+
+            drawLobby();
+
+            // ── MAIN GAME ─────────────────────────────────────────────────────
+            function startGame() {
+                lobbyState = 'game';
+                let frameCount = 0;
+                let kills = 0;
+                let alive = 50;
             const MAP_SIZE = 2400;
             const cam = { x: 0, y: 0 };
             const storm = { cx: MAP_SIZE / 2, cy: MAP_SIZE / 2, r: MAP_SIZE * 0.48, targetR: MAP_SIZE * 0.15, shrinkRate: 0.035 };
@@ -2101,6 +2305,16 @@ motocrossx3m: {
                 if (running) animId = requestAnimationFrame(loop);
             }
             animId = requestAnimationFrame(loop);
+            } // end startGame
+
+            // Clean up everything including lobby overlay
+            window._gameCleanup = () => {
+                running = false;
+                cancelAnimationFrame(animId);
+                if (channel && channel._ws) channel._ws.close();
+                const lo = document.getElementById('br-lobby-overlay');
+                if (lo) lo.remove();
+            };
         }
     },
 };
