@@ -1712,13 +1712,37 @@ motocrossx3m: {
             let score = 0;
             let animId;
             let bgHue = 220;
+            let attempt = 1;
+            let bestScore = 0;
 
             const GROUND_Y = canvas.height - 80;
             const TILE = 40;
             const SPEED_INIT = 5;
-            let speed = SPEED_INIT;
 
-            // Player y is the TOP of the cube. Starts sitting on ground.
+            // ── LEVELS ──────────────────────────────────────────────────────
+            // Each level: name, hue, speedMult, obstaclePatterns
+            const LEVELS = [
+                { name: "STEREO MADNESS",  hue: 220, speedMult: 1.0,  patternSet: 'easy'   },
+                { name: "BACK ON TRACK",   hue: 160, speedMult: 1.15, patternSet: 'easy'   },
+                { name: "POLARGEIST",      hue: 280, speedMult: 1.25, patternSet: 'medium' },
+                { name: "DRY OUT",         hue: 30,  speedMult: 1.35, patternSet: 'medium' },
+                { name: "BASE AFTER BASE", hue: 0,   speedMult: 1.45, patternSet: 'medium' },
+                { name: "CANT LET GO",     hue: 190, speedMult: 1.55, patternSet: 'hard'   },
+                { name: "JUMPER",          hue: 330, speedMult: 1.65, patternSet: 'hard'   },
+                { name: "TIME MACHINE",    hue: 50,  speedMult: 1.75, patternSet: 'insane' },
+                { name: "CYCLES",          hue: 260, speedMult: 1.9,  patternSet: 'insane' },
+                { name: "xSTEP",           hue: 130, speedMult: 2.1,  patternSet: 'demon'  },
+            ];
+            let currentLevel = 0;
+            let levelProgress = 0; // distance traveled in this level
+            const LEVEL_LENGTH = 2000; // score units per level
+
+            // Show level select screen
+            let gamePhase = 'levelselect'; // levelselect | playing
+            let selectedLevel = 0;
+
+            // ── PLAYER ──────────────────────────────────────────────────────
+            let speed = SPEED_INIT;
             const player = { x: 120, y: GROUND_Y - 36, w: 36, h: 36, vy: 0, onGround: true, rotation: 0, dead: false };
             const GRAVITY = 0.55;
             const JUMP_FORCE = -12.5;
@@ -1732,23 +1756,45 @@ motocrossx3m: {
                 stars.push({ x: Math.random() * canvas.width, y: Math.random() * (GROUND_Y - 20), r: Math.random() * 1.5 + 0.3, speed: Math.random() * 0.8 + 0.2 });
             }
 
-            window._gameCleanup = () => { running = false; cancelAnimationFrame(animId); window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); };
+            window._gameCleanup = () => { running = false; cancelAnimationFrame(animId); window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); removeLevelSelect(); };
 
-            function genObstacle(baseX) {
-                const roll = Math.random();
+            // ── OBSTACLE PATTERNS ───────────────────────────────────────────
+            function genObstacle(baseX, patternSet) {
                 const items = [];
-                if (roll < 0.3) {
-                    items.push({ type: 'spike', x: baseX, y: GROUND_Y });
-                } else if (roll < 0.55) {
-                    items.push({ type: 'spike', x: baseX, y: GROUND_Y });
-                    items.push({ type: 'spike', x: baseX + TILE * 0.8, y: GROUND_Y });
-                } else if (roll < 0.75) {
-                    items.push({ type: 'block', x: baseX, y: GROUND_Y - TILE, w: TILE, h: TILE });
-                    items.push({ type: 'spike', x: baseX + TILE, y: GROUND_Y });
-                } else {
-                    items.push({ type: 'block', x: baseX, y: GROUND_Y - TILE * 1.5, w: TILE, h: TILE * 1.5 });
-                }
-                return items;
+                const patterns = {
+                    easy: [
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }],
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'spike', x:baseX+TILE*0.85, y:GROUND_Y }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE, h:TILE }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE, h:TILE }, { type:'spike', x:baseX+TILE+10, y:GROUND_Y }],
+                    ],
+                    medium: [
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'spike', x:baseX+TILE*0.85, y:GROUND_Y }, { type:'spike', x:baseX+TILE*1.7, y:GROUND_Y }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE*1.5, w:TILE, h:TILE*1.5 }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE, h:TILE }, { type:'block', x:baseX+TILE+20, y:GROUND_Y-TILE*1.5, w:TILE, h:TILE*1.5 }],
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'block', x:baseX+TILE+5, y:GROUND_Y-TILE, w:TILE, h:TILE }, { type:'spike', x:baseX+TILE*2+10, y:GROUND_Y }],
+                    ],
+                    hard: [
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE, h:TILE }, { type:'spike', x:baseX+TILE+5, y:GROUND_Y }, { type:'spike', x:baseX+TILE*1.9, y:GROUND_Y }, { type:'block', x:baseX+TILE*3, y:GROUND_Y-TILE*1.5, w:TILE, h:TILE*1.5 }],
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'spike', x:baseX+TILE*0.85, y:GROUND_Y }, { type:'spike', x:baseX+TILE*1.7, y:GROUND_Y }, { type:'spike', x:baseX+TILE*2.55, y:GROUND_Y }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE*2, w:TILE, h:TILE*2 }, { type:'spike', x:baseX+TILE+5, y:GROUND_Y }, { type:'spike', x:baseX+TILE*1.9, y:GROUND_Y }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE*2, h:TILE }, { type:'spike', x:baseX+TILE*2+10, y:GROUND_Y }, { type:'block', x:baseX+TILE*3+10, y:GROUND_Y-TILE, w:TILE, h:TILE }],
+                    ],
+                    insane: [
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'block', x:baseX+TILE*0.85, y:GROUND_Y-TILE*2, w:TILE, h:TILE*2 }, { type:'spike', x:baseX+TILE*2, y:GROUND_Y }, { type:'spike', x:baseX+TILE*2.85, y:GROUND_Y }, { type:'block', x:baseX+TILE*4, y:GROUND_Y-TILE, w:TILE, h:TILE }],
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE*3, h:TILE }, { type:'spike', x:baseX+TILE*3+5, y:GROUND_Y }, { type:'spike', x:baseX+TILE*3.9, y:GROUND_Y }, { type:'spike', x:baseX+TILE*4.75, y:GROUND_Y }],
+                        () => [0,1,2,3,4].map(i => ({ type:'spike', x:baseX+i*TILE*0.85, y:GROUND_Y })).flat(),
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE*1.5, w:TILE, h:TILE*1.5 }, { type:'block', x:baseX+TILE+15, y:GROUND_Y-TILE*2, w:TILE, h:TILE*2 }, { type:'block', x:baseX+TILE*2+30, y:GROUND_Y-TILE*2.5, w:TILE, h:TILE*2.5 }],
+                    ],
+                    demon: [
+                        () => [{ type:'block', x:baseX, y:GROUND_Y-TILE, w:TILE, h:TILE }, { type:'spike', x:baseX+TILE+5, y:GROUND_Y }, { type:'spike', x:baseX+TILE*1.9, y:GROUND_Y }, { type:'spike', x:baseX+TILE*2.75, y:GROUND_Y }, { type:'block', x:baseX+TILE*3.6, y:GROUND_Y-TILE*2, w:TILE, h:TILE*2 }, { type:'spike', x:baseX+TILE*4.7, y:GROUND_Y }],
+                        () => [0,1,2,3,4,5].map(i => ({ type:'spike', x:baseX+i*TILE*0.82, y:GROUND_Y })).flat(),
+                        () => [0,1,2,3].map(i => ({ type:'block', x:baseX+i*(TILE+10), y:GROUND_Y-TILE*(1+i*0.5), w:TILE, h:TILE*(1+i*0.5) })).flat(),
+                        () => [{ type:'spike', x:baseX, y:GROUND_Y }, { type:'block', x:baseX+TILE*0.85, y:GROUND_Y-TILE*3, w:TILE, h:TILE*3 }, { type:'spike', x:baseX+TILE*2, y:GROUND_Y }, { type:'spike', x:baseX+TILE*2.85, y:GROUND_Y }, { type:'spike', x:baseX+TILE*3.7, y:GROUND_Y }, { type:'block', x:baseX+TILE*4.6, y:GROUND_Y-TILE, w:TILE*2, h:TILE }],
+                    ],
+                };
+                const set = patterns[patternSet] || patterns.easy;
+                return set[Math.floor(Math.random() * set.length)]();
             }
 
             let jumpPressed = false;
@@ -1760,6 +1806,7 @@ motocrossx3m: {
             canvas.addEventListener('click', onTap);
 
             function doJump() {
+                if (gamePhase !== 'playing') return;
                 if (player.onGround && !player.dead) { player.vy = JUMP_FORCE; player.onGround = false; spawnJumpParticles(); }
             }
 
@@ -1791,17 +1838,79 @@ motocrossx3m: {
                 ctx.fillStyle = fill; ctx.fill(); ctx.shadowBlur = 0;
             }
 
+            // ── LEVEL SELECT OVERLAY ─────────────────────────────────────────
+            const lsOverlay = document.createElement('div');
+            lsOverlay.id = 'gr-level-select';
+            lsOverlay.style.cssText = `position:absolute;inset:0;background:rgba(8,6,24,0.97);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:200;overflow-y:auto;padding:20px;font-family:'Share Tech Mono',monospace;color:#f1f5f9;`;
+            canvas.parentElement.appendChild(lsOverlay);
+
+            const diffColors = { easy:'#22c55e', medium:'#f59e0b', hard:'#ef4444', insane:'#a855f7', demon:'#ec4899' };
+            const diffLabels = { easy:'EASY', medium:'NORMAL', hard:'HARD', insane:'INSANE', demon:'DEMON' };
+
+            function renderLevelSelect() {
+                lsOverlay.innerHTML = `
+                    <div style="text-align:center;width:100%;max-width:700px;">
+                        <div style="font-size:36px;margin-bottom:4px;">🔷</div>
+                        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:#818cf8;letter-spacing:3px;margin-bottom:20px;">GEOMETRY RUSH</div>
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+                            ${LEVELS.map((lv, i) => `
+                                <div onclick="window._grSelectLevel(${i})" style="cursor:pointer;background:rgba(99,102,241,0.08);border:2px solid ${i===selectedLevel?'#818cf8':'rgba(99,102,241,0.2)'};border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
+                                    <div style="font-size:22px;min-width:32px;text-align:center;">${['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i]}</div>
+                                    <div style="text-align:left;flex:1;">
+                                        <div style="font-size:12px;font-weight:700;letter-spacing:1px;color:#f1f5f9;">${lv.name}</div>
+                                        <div style="font-size:10px;color:${diffColors[lv.patternSet]};letter-spacing:2px;margin-top:2px;">${diffLabels[lv.patternSet]} · ${lv.speedMult}x SPEED</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="window._grStartLevel()" style="width:100%;max-width:300px;padding:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;border-radius:12px;color:#fff;font-size:15px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:2px;margin-bottom:8px;">▶ PLAY ${LEVELS[selectedLevel].name}</button>
+                    </div>`;
+            }
+
+            window._grSelectLevel = (i) => { selectedLevel = i; renderLevelSelect(); };
+            window._grStartLevel = () => {
+                currentLevel = selectedLevel;
+                bgHue = LEVELS[currentLevel].hue;
+                speed = SPEED_INIT * LEVELS[currentLevel].speedMult;
+                lsOverlay.style.display = 'none';
+                gamePhase = 'playing';
+                attempt = 1; score = 0; levelProgress = 0;
+                player.y = GROUND_Y - 36; player.vy = 0; player.onGround = true; player.dead = false; player.rotation = 0;
+                obstacles = []; particles = [];
+                nextObstacleX = canvas.width + 200;
+            };
+
+            function removeLevelSelect() {
+                lsOverlay.remove();
+                delete window._grSelectLevel;
+                delete window._grStartLevel;
+            }
+
+            renderLevelSelect();
+
+            function resetLevel() {
+                attempt++;
+                if (score > bestScore) bestScore = score;
+                score = 0; levelProgress = 0;
+                player.y = GROUND_Y - 36; player.vy = 0; player.onGround = true; player.dead = false; player.rotation = 0;
+                obstacles = []; nextObstacleX = canvas.width + 200;
+                speed = SPEED_INIT * LEVELS[currentLevel].speedMult;
+                bgHue = LEVELS[currentLevel].hue;
+            }
+
             function loop() {
                 if (!running) return;
                 frameCount++;
-                bgHue = (bgHue + 0.15) % 360;
-                speed = SPEED_INIT + score * 0.004;
 
-                // Background
+                // Draw background even during level select for ambiance
                 const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
                 grad.addColorStop(0, `hsl(${bgHue},60%,8%)`);
                 grad.addColorStop(1, `hsl(${bgHue + 30},50%,4%)`);
                 ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (gamePhase !== 'playing') { animId = requestAnimationFrame(loop); return; }
+
+                bgHue += 0.08;
 
                 stars.forEach(s => {
                     s.x -= s.speed * (speed / SPEED_INIT);
@@ -1810,7 +1919,7 @@ motocrossx3m: {
                     ctx.fillStyle = `rgba(255,255,255,${0.3 + s.r * 0.2})`; ctx.fill();
                 });
 
-                // Ground — drawn at GROUND_Y which is the surface
+                // Ground
                 ctx.fillStyle = `hsl(${bgHue},70%,30%)`;
                 ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
                 ctx.shadowBlur = 12; ctx.shadowColor = `hsl(${bgHue},90%,60%)`;
@@ -1820,12 +1929,21 @@ motocrossx3m: {
                 ctx.strokeStyle = `hsla(${bgHue},60%,50%,0.2)`; ctx.lineWidth = 1;
                 for (let gx = -gridOff; gx < canvas.width; gx += 80) { ctx.beginPath(); ctx.moveTo(gx, GROUND_Y); ctx.lineTo(gx, canvas.height); ctx.stroke(); }
 
+                // Level progress bar
+                const pct = Math.min(levelProgress / LEVEL_LENGTH, 1);
+                ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, canvas.height - 8, canvas.width, 8);
+                const progGrad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                progGrad.addColorStop(0, `hsl(${bgHue},90%,55%)`);
+                progGrad.addColorStop(1, `hsl(${bgHue+60},90%,65%)`);
+                ctx.fillStyle = progGrad; ctx.fillRect(0, canvas.height - 8, canvas.width * pct, 8);
+
                 // Spawn obstacles
                 nextObstacleX -= speed;
+                const lvl = LEVELS[currentLevel];
+                const gap = Math.max(160, 260 - score * 0.05) + Math.random() * 120;
                 if (nextObstacleX <= canvas.width + 10) {
-                    const gap = 220 + Math.random() * 180;
-                    obstacles.push(...genObstacle(canvas.width + gap));
-                    nextObstacleX = canvas.width + gap + 120 + Math.random() * 100;
+                    obstacles.push(...genObstacle(canvas.width + gap, lvl.patternSet));
+                    nextObstacleX = canvas.width + gap + 100 + Math.random() * 80;
                 }
 
                 obstacles.forEach(o => { o.x -= speed; });
@@ -1843,64 +1961,40 @@ motocrossx3m: {
                 });
 
                 if (!player.dead) {
-                    // 1. Apply gravity and move
                     player.vy += GRAVITY;
                     player.y += player.vy;
 
-                    // 2. Snap to ground
                     if (player.y + player.h >= GROUND_Y) {
                         player.y = GROUND_Y - player.h;
-                        player.vy = 0;
-                        player.onGround = true;
+                        player.vy = 0; player.onGround = true;
                         player.rotation = Math.round(player.rotation / 90) * 90;
                     } else {
                         player.onGround = false;
                     }
 
-                    // 3. Rotate only while airborne
                     if (!player.onGround) player.rotation += 4 * (speed / SPEED_INIT);
 
-                    // 4. Collision with obstacles
                     for (const o of obstacles) {
                         const shrink = 5;
-                        const px = player.x + shrink;
-                        const py = player.y + shrink;
-                        const pw = player.w - shrink * 2;
-                        const ph = player.h - shrink * 2;
-
+                        const px = player.x + shrink, py = player.y + shrink, pw = player.w - shrink * 2, ph = player.h - shrink * 2;
                         if (o.type === 'spike') {
-                            // Spike triangle: base at o.y, tip at o.y - TILE*0.8
-                            // Use a conservative inner rect for the triangle hitbox
-                            const tx = o.x + TILE * 0.25;
-                            const ty = o.y - TILE * 0.72;
-                            const tw = TILE * 0.5;
-                            const th = TILE * 0.72;
-                            if (rectOverlap(px, py, pw, ph, tx, ty, tw, th)) {
-                                if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { running = false; window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); cancelAnimationFrame(animId); onGameOver(Math.floor(score)); } }, 600); }
+                            if (rectOverlap(px, py, pw, ph, o.x + TILE * 0.25, o.y - TILE * 0.72, TILE * 0.5, TILE * 0.72)) {
+                                if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { resetLevel(); } }, 700); }
                             }
                         } else {
-                            // Block: kill on any overlap EXCEPT pure top-landing
-                            // Top-landing is handled separately below — here we only check side/front hit
                             if (rectOverlap(px, py, pw, ph, o.x, o.y, o.w, o.h)) {
-                                // Check if player is landing on top (coming from above)
                                 const playerBottom = player.y + player.h;
                                 const prevBottom = playerBottom - player.vy;
                                 const landingOnTop = prevBottom <= o.y + 2 && player.x + player.w - shrink > o.x + 2 && player.x + shrink < o.x + o.w - 2;
                                 if (!landingOnTop) {
-                                    if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { running = false; window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); canvas.removeEventListener('click', onTap); cancelAnimationFrame(animId); onGameOver(Math.floor(score)); } }, 600); }
+                                    if (!player.dead) { player.dead = true; spawnDeathParticles(); setTimeout(() => { if (running) { resetLevel(); } }, 700); }
                                 } else {
-                                    // Land on top of block
-                                    player.y = o.y - player.h;
-                                    player.vy = 0;
-                                    player.onGround = true;
+                                    player.y = o.y - player.h; player.vy = 0; player.onGround = true;
                                     player.rotation = Math.round(player.rotation / 90) * 90;
                                 }
                             }
                         }
                     }
-
-                    // Rotate while airborne
-                    if (!player.onGround) player.rotation += 4 * (speed / SPEED_INIT);
 
                     ctx.save();
                     ctx.translate(player.x + player.w / 2, player.y + player.h / 2);
@@ -1912,7 +2006,27 @@ motocrossx3m: {
                     ctx.strokeRect(-player.w / 2 + 4, -player.h / 2 + 4, player.w - 8, player.h - 8);
                     ctx.fillStyle = `hsl(${hue2},100%,85%)`; ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
                     ctx.restore();
+
                     score += speed * 0.03;
+                    levelProgress += speed * 0.03;
+
+                    // Level complete
+                    if (levelProgress >= LEVEL_LENGTH) {
+                        player.dead = true;
+                        // Flash + show next level
+                        ctx.fillStyle = 'rgba(0,255,100,0.15)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+                        setTimeout(() => {
+                            if (!running) return;
+                            if (currentLevel < LEVELS.length - 1) {
+                                selectedLevel = currentLevel + 1;
+                                renderLevelSelect();
+                                lsOverlay.style.display = 'flex';
+                                gamePhase = 'levelselect';
+                            } else {
+                                running = false; cancelAnimationFrame(animId); onGameOver(Math.floor(score));
+                            }
+                        }, 800);
+                    }
                 }
 
                 particles.forEach(p => {
@@ -1925,17 +2039,20 @@ motocrossx3m: {
                 ctx.globalAlpha = 1;
                 particles = particles.filter(p => p.life > 0);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, canvas.width, 44);
-                ctx.fillStyle = '#f1f5f9'; ctx.font = "bold 15px 'Share Tech Mono'";
-                ctx.textAlign = 'left'; ctx.fillText(`SCORE: ${Math.floor(score)}`, 16, 28);
-                ctx.fillStyle = `hsl(${bgHue},80%,65%)`; ctx.textAlign = 'right';
-                ctx.fillText('SPACE / CLICK to jump', canvas.width - 16, 28); ctx.textAlign = 'left';
+                // HUD
+                ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, 0, canvas.width, 44);
+                ctx.fillStyle = '#f1f5f9'; ctx.font = "bold 13px 'Share Tech Mono'";
+                ctx.textAlign = 'left'; ctx.fillText(`${LEVELS[currentLevel].name}`, 16, 16);
+                ctx.fillStyle = `hsl(${bgHue},80%,65%)`; ctx.fillText(`SCORE: ${Math.floor(score)}  ATTEMPT: ${attempt}  BEST: ${Math.floor(bestScore)}`, 16, 34);
+                ctx.fillStyle = `hsl(${bgHue+60},70%,60%)`; ctx.textAlign = 'right';
+                ctx.fillText(`${Math.floor(pct*100)}%`, canvas.width - 16, 28); ctx.textAlign = 'left';
 
                 if (running) animId = requestAnimationFrame(loop);
             }
             animId = requestAnimationFrame(loop);
         }
     },
+
 
     // ─── BATTLE ROYALE (Fortnite-style) with Lobby ───────────────────────────
     battleRoyale: {
@@ -1951,160 +2068,135 @@ motocrossx3m: {
             const W = canvas.width, H = canvas.height;
 
             // ── LOBBY SYSTEM ──────────────────────────────────────────────────
-            let lobbyState = 'menu'; // menu | lobby | game
+            let lobbyState = 'menu';
             let partyCode = '';
             let partyMembers = [];
             let isHost = false;
-            let myName = (window._currentUsername) || 'Player';
+            let myName = 'Player';
             let channel = null;
 
-            const SUPABASE_URL = 'https://pzmfsbajmntwvvvxdlra.supabase.co';
-            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWZzYmFqbW50d3Z2dnhkbHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTUyOTEsImV4cCI6MjA5MjEzMTI5MX0.VSX10eIB7abkAgjh1Bf3WDFfOm8vmMEqS1LVDkuopZE';
+            const _unEl = document.getElementById('username-display') || document.querySelector('[id*="username"]');
+            if (_unEl && _unEl.innerText && _unEl.innerText !== 'Ghost') myName = _unEl.innerText.trim();
+            if (window._currentUsername) myName = window._currentUsername;
+            const sbClient = window.sb;
 
-            // Try to get username from the page
-            const usernameEl = document.getElementById('username-display') || document.getElementById('nav-username');
-            if (usernameEl && usernameEl.innerText && usernameEl.innerText !== 'Ghost') myName = usernameEl.innerText.trim();
+            function genCode() { return Math.random().toString(36).substring(2,7).toUpperCase(); }
 
-            function genCode() {
-                return Math.random().toString(36).substring(2, 7).toUpperCase();
+            function subscribeToParty(code, onSubscribed, onGameStart) {
+                if (channel) { try { sbClient.removeChannel(channel); } catch(e){} channel = null; }
+                channel = sbClient.channel(`party-${code}`, { config: { broadcast: { self: true } } });
+                channel
+                    .on('broadcast', { event: 'member_update' }, ({ payload }) => {
+                        if (payload.members) { partyMembers = payload.members; drawLobby(); }
+                    })
+                    .on('broadcast', { event: 'start_game' }, ({ payload }) => {
+                        selectedMapIdx = payload.mapIdx || 0;
+                        onGameStart();
+                    })
+                    .subscribe((status) => { if (status === 'SUBSCRIBED') onSubscribed(); });
             }
 
-            function joinChannel(code) {
-                if (channel) channel.unsubscribe();
-                // Use supabase from window if available, else raw fetch for broadcast
-                const chName = `party-${code}`;
-                // Use raw Supabase Realtime via WebSocket broadcast
-                channel = { code, members: partyMembers, _ws: null };
+            function broadcastMembers() { if (channel) channel.send({ type:'broadcast', event:'member_update', payload:{ members: partyMembers } }); }
+            function broadcastStart(mapIdx) { if (channel) channel.send({ type:'broadcast', event:'start_game', payload:{ mapIdx } }); }
 
-                // Broadcast via Supabase Realtime REST channel
-                const wsUrl = `wss://pzmfsbajmntwvvvxdlra.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`;
-                const ws = new WebSocket(wsUrl);
-                channel._ws = ws;
-
-                ws.onopen = () => {
-                    // Join channel
-                    ws.send(JSON.stringify({ topic: `realtime:${chName}`, event: 'phx_join', payload: {}, ref: '1' }));
-                };
-
-                ws.onmessage = (e) => {
-                    try {
-                        const msg = JSON.parse(e.data);
-                        if (msg.event === 'broadcast' && msg.payload?.type === 'member_update') {
-                            partyMembers = msg.payload.members || [];
-                            drawLobby();
-                        }
-                        if (msg.event === 'broadcast' && msg.payload?.type === 'start_game') {
-                            startGame();
-                        }
-                    } catch {}
-                };
-
-                ws.onerror = () => {};
-                return ws;
-            }
-
-            function broadcastMembers(ws, code) {
-                if (!ws || ws.readyState !== 1) return;
-                ws.send(JSON.stringify({
-                    topic: `realtime:party-${code}`,
-                    event: 'broadcast',
-                    payload: { type: 'member_update', members: partyMembers },
-                    ref: '2'
-                }));
-            }
-
-            function broadcastStart(ws, code) {
-                if (!ws || ws.readyState !== 1) return;
-                ws.send(JSON.stringify({
-                    topic: `realtime:party-${code}`,
-                    event: 'broadcast',
-                    payload: { type: 'start_game' },
-                    ref: '3'
-                }));
-            }
-
-            // ── LOBBY OVERLAY (HTML overlay on top of canvas) ─────────────────
+            // ── LOBBY OVERLAY ─────────────────────────────────────────────────
             const overlay = document.createElement('div');
             overlay.id = 'br-lobby-overlay';
-            overlay.style.cssText = `position:absolute;inset:0;background:rgba(10,20,10,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;font-family:'Share Tech Mono',monospace;color:#f1f5f9;`;
+            overlay.style.cssText = `position:absolute;inset:0;background:rgba(10,20,10,0.97);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:24px;z-index:200;font-family:'Share Tech Mono',monospace;color:#f1f5f9;`;
             canvas.parentElement.appendChild(overlay);
+
+            const MAPS = [
+                { name: 'VERDANT ISLAND',  emoji: '🌴', desc: 'Tropical paradise. Dense trees, open center.',  color: '#166534' },
+                { name: 'FROZEN TUNDRA',   emoji: '❄️', desc: 'Ice fields. Few cover spots. High visibility.', color: '#1e3a5f' },
+                { name: 'DESERT RUINS',    emoji: '🏜️', desc: 'Ancient ruins. Many buildings. Tight corridors.', color: '#78350f' },
+            ];
+            let selectedMapIdx = 0;
 
             function drawLobby() {
                 if (lobbyState === 'menu') {
+                    const mapCards = MAPS.map((m,i) => `
+                        <div onclick="window._brPickMap(${i})" style="cursor:pointer;padding:10px 14px;background:rgba(74,222,128,0.06);border:2px solid ${i===selectedMapIdx?'#4ade80':'rgba(74,222,128,0.15)'};border-radius:10px;flex:1;min-width:120px;text-align:center;">
+                            <div style="font-size:22px;">${m.emoji}</div>
+                            <div style="font-size:10px;color:#4ade80;letter-spacing:1px;margin-top:4px;">${m.name}</div>
+                            <div style="font-size:9px;color:#6b7280;margin-top:2px;">${m.desc}</div>
+                        </div>`).join('');
+
                     overlay.innerHTML = `
-                        <div style="text-align:center;max-width:420px;width:90%;">
-                            <div style="font-size:40px;margin-bottom:8px;">🪖</div>
-                            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#4ade80;letter-spacing:2px;margin-bottom:4px;">BATTLE ROYALE</div>
-                            <div style="font-size:11px;color:#6b7280;margin-bottom:32px;letter-spacing:3px;">PLAYING AS: ${myName}</div>
-                            <button id="br-create" style="width:100%;padding:14px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:15px;font-family:'Share Tech Mono',monospace;cursor:pointer;margin-bottom:12px;letter-spacing:2px;">⚔ CREATE PARTY</button>
-                            <div style="color:#6b7280;font-size:11px;margin:12px 0;letter-spacing:2px;">─── OR JOIN ───</div>
-                            <div style="display:flex;gap:8px;">
+                        <div style="text-align:center;max-width:460px;width:100%;">
+                            <div style="font-size:36px;margin-bottom:4px;">🪖</div>
+                            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:#4ade80;letter-spacing:2px;margin-bottom:4px;">BATTLE ROYALE</div>
+                            <div style="font-size:11px;color:#6b7280;margin-bottom:16px;letter-spacing:2px;">PLAYING AS: ${myName}</div>
+                            <div style="font-size:11px;color:#6b7280;letter-spacing:2px;margin-bottom:8px;">SELECT MAP</div>
+                            <div style="display:flex;gap:8px;margin-bottom:20px;">${mapCards}</div>
+                            <button id="br-create" style="width:100%;padding:13px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:14px;font-family:'Share Tech Mono',monospace;cursor:pointer;margin-bottom:10px;letter-spacing:2px;">⚔ CREATE PARTY</button>
+                            <div style="color:#6b7280;font-size:11px;margin:8px 0;letter-spacing:2px;">─── OR JOIN ───</div>
+                            <div style="display:flex;gap:8px;margin-bottom:6px;">
                                 <input id="br-code-input" placeholder="ENTER CODE" maxlength="5" style="flex:1;padding:12px;background:#1a2a1a;border:1px solid #374151;border-radius:8px;color:#4ade80;font-family:'Share Tech Mono',monospace;font-size:16px;letter-spacing:4px;text-align:center;text-transform:uppercase;" />
-                                <button id="br-join" style="padding:12px 18px;background:#1e3a5f;border:none;border-radius:8px;color:#93c5fd;font-family:'Share Tech Mono',monospace;cursor:pointer;font-size:13px;letter-spacing:1px;">JOIN</button>
+                                <button id="br-join" style="padding:12px 18px;background:#1e3a5f;border:none;border-radius:8px;color:#93c5fd;font-family:'Share Tech Mono',monospace;cursor:pointer;font-size:13px;">JOIN</button>
                             </div>
-                            <button id="br-solo" style="width:100%;margin-top:20px;padding:12px;background:transparent;border:1px solid #374151;border-radius:10px;color:#6b7280;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;">▷ PLAY SOLO (vs bots)</button>
+                            <div id="br-err" style="color:#ef4444;font-size:11px;min-height:14px;margin-bottom:8px;"></div>
+                            <button id="br-solo" style="width:100%;padding:11px;background:transparent;border:1px solid #374151;border-radius:10px;color:#6b7280;font-size:12px;font-family:'Share Tech Mono',monospace;cursor:pointer;">▷ PLAY SOLO</button>
                         </div>`;
+
+                    window._brPickMap = (i) => { selectedMapIdx = i; drawLobby(); };
                     document.getElementById('br-create').onclick = () => {
-                        partyCode = genCode();
-                        isHost = true;
-                        partyMembers = [{ name: myName, ready: true, host: true }];
-                        const ws = joinChannel(partyCode);
-                        channel._ws = ws;
-                        lobbyState = 'lobby';
-                        setTimeout(() => { broadcastMembers(ws, partyCode); drawLobby(); }, 800);
+                        partyCode = genCode(); isHost = true;
+                        partyMembers = [{ name: myName, host: true }];
+                        document.getElementById('br-create').innerText = 'Connecting...';
+                        subscribeToParty(partyCode, () => { broadcastMembers(); lobbyState = 'lobby'; drawLobby(); }, () => { overlay.remove(); startGame(); });
                     };
                     document.getElementById('br-join').onclick = () => {
                         const code = document.getElementById('br-code-input').value.trim().toUpperCase();
-                        if (code.length !== 5) { document.getElementById('br-code-input').style.borderColor = '#ef4444'; return; }
-                        partyCode = code;
-                        isHost = false;
-                        partyMembers = [{ name: myName, ready: true, host: false }];
-                        const ws = joinChannel(code);
-                        channel._ws = ws;
-                        lobbyState = 'lobby';
-                        setTimeout(() => { broadcastMembers(ws, partyCode); drawLobby(); }, 800);
+                        if (code.length !== 5) { document.getElementById('br-err').innerText = 'Code must be 5 characters'; return; }
+                        partyCode = code; isHost = false;
+                        document.getElementById('br-join').innerText = '...';
+                        subscribeToParty(partyCode, () => {
+                            partyMembers = [...partyMembers.filter(m => m.name !== myName), { name: myName, host: false }];
+                            broadcastMembers(); lobbyState = 'lobby'; drawLobby();
+                        }, () => { overlay.remove(); startGame(); });
                     };
                     document.getElementById('br-solo').onclick = () => { overlay.remove(); startGame(); };
+
                 } else if (lobbyState === 'lobby') {
-                    const memberRows = partyMembers.map(m =>
-                        `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(74,222,128,0.07);border-radius:8px;margin-bottom:6px;">
-                            <span style="font-size:18px;">${m.host ? '👑' : '🪖'}</span>
-                            <span style="flex:1;color:${m.host ? '#4ade80' : '#f1f5f9'};font-size:13px;">${m.name}</span>
+                    const rows = partyMembers.map(m => `
+                        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(74,222,128,0.07);border-radius:8px;margin-bottom:6px;">
+                            <span>${m.host?'👑':'🪖'}</span>
+                            <span style="flex:1;color:${m.host?'#4ade80':'#f1f5f9'};font-size:13px;">${m.name}</span>
                             <span style="font-size:10px;color:#10b981;letter-spacing:2px;">READY</span>
-                        </div>`
-                    ).join('');
+                        </div>`).join('');
+                    const mapInfo = MAPS[selectedMapIdx];
                     overlay.innerHTML = `
-                        <div style="text-align:center;max-width:420px;width:90%;">
-                            <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#4ade80;margin-bottom:4px;">PARTY LOBBY</div>
-                            <div style="font-size:11px;color:#6b7280;margin-bottom:6px;letter-spacing:3px;">SHARE CODE WITH FRIENDS</div>
-                            <div style="font-size:32px;font-weight:700;color:#fbbf24;letter-spacing:10px;background:#1a2a1a;padding:14px 20px;border-radius:10px;border:1px solid #374151;margin-bottom:20px;">${partyCode}</div>
-                            <div style="font-size:11px;color:#6b7280;letter-spacing:2px;margin-bottom:10px;">PARTY (${partyMembers.length}/4)</div>
-                            <div style="margin-bottom:20px;">${memberRows}</div>
+                        <div style="text-align:center;max-width:420px;width:100%;">
+                            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#4ade80;margin-bottom:4px;">PARTY LOBBY</div>
+                            <div style="font-size:11px;color:#6b7280;margin-bottom:6px;letter-spacing:2px;">SHARE CODE WITH FRIENDS</div>
+                            <div style="font-size:30px;font-weight:700;color:#fbbf24;letter-spacing:10px;background:#1a2a1a;padding:12px 20px;border-radius:10px;border:1px solid #374151;margin-bottom:12px;">${partyCode}</div>
+                            <div style="padding:8px 14px;background:rgba(74,222,128,0.06);border-radius:8px;margin-bottom:14px;font-size:12px;">
+                                MAP: <span style="color:#4ade80;">${mapInfo.emoji} ${mapInfo.name}</span>
+                            </div>
+                            <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">PARTY (${partyMembers.length}/4)</div>
+                            <div style="margin-bottom:16px;">${rows}</div>
                             ${isHost
-                                ? `<button id="br-start" style="width:100%;padding:14px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:15px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:2px;">▶ START GAME</button>`
-                                : `<div style="color:#6b7280;font-size:12px;letter-spacing:2px;padding:14px;border:1px solid #374151;border-radius:10px;">Waiting for host to start...</div>`
+                                ? `<button id="br-start" style="width:100%;padding:13px;background:linear-gradient(135deg,#166534,#15803d);border:none;border-radius:10px;color:#fff;font-size:14px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:2px;">▶ START GAME</button>`
+                                : `<div style="color:#6b7280;font-size:12px;padding:13px;border:1px solid #374151;border-radius:10px;">Waiting for host to start...</div>`
                             }
-                            <button id="br-leave" style="width:100%;margin-top:10px;padding:10px;background:transparent;border:1px solid #374151;border-radius:8px;color:#6b7280;font-size:12px;font-family:'Share Tech Mono',monospace;cursor:pointer;">✕ LEAVE PARTY</button>
+                            <button id="br-leave" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid #374151;border-radius:8px;color:#6b7280;font-size:12px;font-family:'Share Tech Mono',monospace;cursor:pointer;">✕ LEAVE PARTY</button>
                         </div>`;
                     if (isHost) {
                         document.getElementById('br-start').onclick = () => {
-                            broadcastStart(channel._ws, partyCode);
-                            overlay.remove();
-                            startGame();
+                            broadcastStart(selectedMapIdx);
+                            setTimeout(() => { overlay.remove(); startGame(); }, 150);
                         };
                     }
                     document.getElementById('br-leave').onclick = () => {
-                        if (channel._ws) channel._ws.close();
-                        lobbyState = 'menu';
-                        partyMembers = [];
-                        partyCode = '';
+                        partyMembers = partyMembers.filter(m => m.name !== myName);
+                        broadcastMembers();
+                        try { sbClient.removeChannel(channel); } catch(e){}
+                        channel = null; lobbyState = 'menu'; partyMembers = []; partyCode = '';
                         drawLobby();
                     };
                 }
             }
-
             drawLobby();
-
             // ── MAIN GAME ─────────────────────────────────────────────────────
             function startGame() {
                 lobbyState = 'game';
@@ -2123,9 +2215,17 @@ motocrossx3m: {
 
             window._gameCleanup = () => { running = false; cancelAnimationFrame(animId); window.removeEventListener('keydown', handleKey); window.removeEventListener('keyup', handleKeyUp); canvas.removeEventListener('mousemove', handleMove); canvas.removeEventListener('click', handleClick); };
 
-            // Map generation
-            for (let i = 0; i < 30; i++) buildings.push({ x: 100 + Math.random() * (MAP_SIZE - 200), y: 100 + Math.random() * (MAP_SIZE - 200), w: 80 + Math.random() * 120, h: 80 + Math.random() * 120, color: `hsl(${30 + Math.random() * 20},20%,${25 + Math.random() * 15}%)` });
-            for (let i = 0; i < 100; i++) trees.push({ x: Math.random() * MAP_SIZE, y: Math.random() * MAP_SIZE, r: 14 + Math.random() * 10 });
+            // Map generation — varies by selectedMapIdx
+            const mapThemes = [
+                { ground:'#1a2a1a', trees:80,  treeColor:'#166534', buildings:20, buildColor:(r)=>`hsl(${140+r*20},30%,${20+r*10}%)`, name:'VERDANT ISLAND'  },
+                { ground:'#1a2a3a', trees:30,  treeColor:'#1e3a5f', buildings:15, buildColor:(r)=>`hsl(${200+r*20},25%,${30+r*10}%)`, name:'FROZEN TUNDRA'   },
+                { ground:'#2a1a0a', trees:20,  treeColor:'#78350f', buildings:45, buildColor:(r)=>`hsl(${25+r*15},30%,${25+r*10}%)`,  name:'DESERT RUINS'   },
+            ];
+            const mapTheme = mapThemes[selectedMapIdx] || mapThemes[0];
+            const numBuildings = mapTheme.buildings;
+            const numTrees = mapTheme.trees;
+            for (let i = 0; i < numBuildings; i++) { const r = Math.random(); buildings.push({ x: 100 + r * (MAP_SIZE-200), y: 100 + Math.random()*(MAP_SIZE-200), w: 60+r*140, h: 60+Math.random()*140, color: mapTheme.buildColor(r) }); }
+            for (let i = 0; i < numTrees; i++) trees.push({ x: Math.random()*MAP_SIZE, y: Math.random()*MAP_SIZE, r: 14+Math.random()*10, color: mapTheme.treeColor });
 
             const lootTypes = [
                 { name: 'medkit', emoji: '💊', color: '#10b981', effect: () => { player.hp = Math.min(player.maxHp, player.hp + 50); } },
