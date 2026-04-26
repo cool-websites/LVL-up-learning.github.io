@@ -2086,8 +2086,22 @@ motocrossx3m: {
                 if (channel) { try { sbClient.removeChannel(channel); } catch(e){} channel = null; }
                 channel = sbClient.channel(`party-${code}`, { config: { broadcast: { self: true } } });
                 channel
-                    .on('broadcast', { event: 'member_update' }, ({ payload }) => {
+                    .on('broadcast', { event: 'member_join' }, ({ payload }) => {
+                        // Someone new joined — merge them in, then rebroadcast full list
+                        if (payload.member) {
+                            const exists = partyMembers.find(m => m.name === payload.member.name);
+                            if (!exists) partyMembers = [...partyMembers, payload.member];
+                            drawLobby();
+                            // Rebroadcast full list so joiner sees everyone
+                            if (channel) channel.send({ type:'broadcast', event:'member_sync', payload:{ members: partyMembers } });
+                        }
+                    })
+                    .on('broadcast', { event: 'member_sync' }, ({ payload }) => {
+                        // Full authoritative list from host — replace
                         if (payload.members) { partyMembers = payload.members; drawLobby(); }
+                    })
+                    .on('broadcast', { event: 'member_leave' }, ({ payload }) => {
+                        if (payload.name) { partyMembers = partyMembers.filter(m => m.name !== payload.name); drawLobby(); }
                     })
                     .on('broadcast', { event: 'start_game' }, ({ payload }) => {
                         selectedMapIdx = payload.mapIdx || 0;
@@ -2096,7 +2110,17 @@ motocrossx3m: {
                     .subscribe((status) => { if (status === 'SUBSCRIBED') onSubscribed(); });
             }
 
-            function broadcastMembers() { if (channel) channel.send({ type:'broadcast', event:'member_update', payload:{ members: partyMembers } }); }
+            // Host/joiner announce themselves — everyone merges
+            function announceJoin() {
+                if (channel) channel.send({ type:'broadcast', event:'member_join', payload:{ member: partyMembers.find(m => m.name === myName) } });
+            }
+            // Host sends full list to sync late joiners
+            function broadcastSync() {
+                if (channel) channel.send({ type:'broadcast', event:'member_sync', payload:{ members: partyMembers } });
+            }
+            function broadcastLeave() {
+                if (channel) channel.send({ type:'broadcast', event:'member_leave', payload:{ name: myName } });
+            }
             function broadcastStart(mapIdx) { if (channel) channel.send({ type:'broadcast', event:'start_game', payload:{ mapIdx } }); }
 
             // ── LOBBY OVERLAY ─────────────────────────────────────────────────
@@ -2143,7 +2167,7 @@ motocrossx3m: {
                         partyCode = genCode(); isHost = true;
                         partyMembers = [{ name: myName, host: true }];
                         document.getElementById('br-create').innerText = 'Connecting...';
-                        subscribeToParty(partyCode, () => { broadcastMembers(); lobbyState = 'lobby'; drawLobby(); }, () => { overlay.remove(); startGame(); });
+                        subscribeToParty(partyCode, () => { announceJoin(); lobbyState = 'lobby'; drawLobby(); }, () => { overlay.remove(); startGame(); });
                     };
                     document.getElementById('br-join').onclick = () => {
                         const code = document.getElementById('br-code-input').value.trim().toUpperCase();
@@ -2151,8 +2175,8 @@ motocrossx3m: {
                         partyCode = code; isHost = false;
                         document.getElementById('br-join').innerText = '...';
                         subscribeToParty(partyCode, () => {
-                            partyMembers = [...partyMembers.filter(m => m.name !== myName), { name: myName, host: false }];
-                            broadcastMembers(); lobbyState = 'lobby'; drawLobby();
+                            partyMembers = [{ name: myName, host: false }];
+                            announceJoin(); lobbyState = 'lobby'; drawLobby();
                         }, () => { overlay.remove(); startGame(); });
                     };
                     document.getElementById('br-solo').onclick = () => { overlay.remove(); startGame(); };
@@ -2188,8 +2212,7 @@ motocrossx3m: {
                         };
                     }
                     document.getElementById('br-leave').onclick = () => {
-                        partyMembers = partyMembers.filter(m => m.name !== myName);
-                        broadcastMembers();
+                        broadcastLeave();
                         try { sbClient.removeChannel(channel); } catch(e){}
                         channel = null; lobbyState = 'menu'; partyMembers = []; partyCode = '';
                         drawLobby();
@@ -2207,13 +2230,65 @@ motocrossx3m: {
             const cam = { x: 0, y: 0 };
             const storm = { cx: MAP_SIZE / 2, cy: MAP_SIZE / 2, r: MAP_SIZE * 0.48, targetR: MAP_SIZE * 0.15, shrinkRate: 0.035 };
 
-            const player = { x: MAP_SIZE / 2 + (Math.random() - 0.5) * 400, y: MAP_SIZE / 2 + (Math.random() - 0.5) * 400, r: 14, angle: 0, speed: 3.2, hp: 100, maxHp: 100, shield: 50, maxShield: 50, ammo: 30, maxAmmo: 30, reloading: false, reloadTimer: 0, dead: false, invincible: 0, fireRate: 8, fireCooldown: 0 };
+            // Spawn teammates near player if in party
+            const spawnOffset = partyMembers.length > 1 ? 200 : 0;
+            const player = { x: MAP_SIZE / 2 + (Math.random() - 0.5) * 400, y: MAP_SIZE / 2 + (Math.random() - 0.5) * 400, r: 14, angle: 0, speed: 3.2, hp: 100, maxHp: 100, shield: 50, maxShield: 50, ammo: 30, maxAmmo: 30, reloading: false, reloadTimer: 0, dead: false, invincible: 0, fireRate: 8, fireCooldown: 0, name: myName };
+
+            // Teammate state — populated via Supabase broadcast
+            let teammates = {};  // key: playerName => { x, y, angle, hp, dead, name }
 
             let bullets = [], bots = [], loot = [], buildings = [], trees = [], particles = [];
             const keys = {};
             let mouseX = W / 2, mouseY = H / 2;
 
-            window._gameCleanup = () => { running = false; cancelAnimationFrame(animId); window.removeEventListener('keydown', handleKey); window.removeEventListener('keyup', handleKeyUp); canvas.removeEventListener('mousemove', handleMove); canvas.removeEventListener('click', handleClick); };
+            // ── NICKNAME CHANGE UI ────────────────────────────────────────────
+            const nickBtn = document.createElement('div');
+            nickBtn.id = 'br-nick-btn';
+            nickBtn.style.cssText = `position:absolute;bottom:58px;right:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#94a3b8;cursor:pointer;z-index:50;`;
+            nickBtn.innerText = `✏ ${player.name}`;
+            canvas.parentElement.appendChild(nickBtn);
+
+            nickBtn.onclick = () => {
+                const input = prompt('Enter new nickname (max 16 chars):', player.name);
+                if (input && input.trim().length > 0) {
+                    player.name = input.trim().substring(0, 16);
+                    myName = player.name;
+                    nickBtn.innerText = `✏ ${player.name}`;
+                    broadcastPosition();
+                }
+            };
+
+            // ── TEAM POSITION SYNC ────────────────────────────────────────────
+            let posChannel = null;
+            if (channel && partyMembers.length > 1) {
+                // Reuse or create a position sync channel
+                posChannel = sbClient.channel(`pos-${partyCode}`, { config: { broadcast: { self: false } } });
+                posChannel
+                    .on('broadcast', { event: 'pos' }, ({ payload }) => {
+                        if (payload.name && payload.name !== player.name) {
+                            teammates[payload.name] = { x: payload.x, y: payload.y, angle: payload.angle, hp: payload.hp, dead: payload.dead, name: payload.name };
+                        }
+                    })
+                    .subscribe();
+            }
+
+            let posSyncTimer = 0;
+            function broadcastPosition() {
+                if (!posChannel) return;
+                posChannel.send({ type: 'broadcast', event: 'pos', payload: { name: player.name, x: player.x, y: player.y, angle: player.angle, hp: player.hp, dead: player.dead } });
+            }
+
+            window._gameCleanup = () => {
+                running = false;
+                cancelAnimationFrame(animId);
+                window.removeEventListener('keydown', handleKey);
+                window.removeEventListener('keyup', handleKeyUp);
+                canvas.removeEventListener('mousemove', handleMove);
+                canvas.removeEventListener('click', handleClick);
+                if (posChannel) { try { sbClient.removeChannel(posChannel); } catch(e){} }
+                const nb = document.getElementById('br-nick-btn');
+                if (nb) nb.remove();
+            };
 
             // Map generation — varies by selectedMapIdx
             const mapThemes = [
@@ -2265,13 +2340,29 @@ motocrossx3m: {
                 ctx.strokeStyle = 'rgba(124,58,237,0.7)'; ctx.lineWidth = 1.5; ctx.stroke();
                 buildings.forEach(b => { ctx.fillStyle = 'rgba(200,180,140,0.4)'; ctx.fillRect(MX + b.x * scale, MY + b.y * scale, b.w * scale, b.h * scale); });
                 bots.filter(b => !b.dead).forEach(b => { ctx.beginPath(); ctx.arc(MX + b.x * scale, MY + b.y * scale, 2, 0, Math.PI * 2); ctx.fillStyle = '#ef4444'; ctx.fill(); });
-                ctx.beginPath(); ctx.arc(MX + player.x * scale, MY + player.y * scale, 3, 0, Math.PI * 2); ctx.fillStyle = '#10b981'; ctx.fill();
+                // Teammates on minimap (cyan)
+                Object.values(teammates).forEach(tm => {
+                    if (tm.dead) return;
+                    ctx.beginPath(); ctx.arc(MX + tm.x * scale, MY + tm.y * scale, 3.5, 0, Math.PI * 2); ctx.fillStyle = '#38bdf8'; ctx.fill();
+                    ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 1; ctx.stroke();
+                });
+                // Player (green)
+                ctx.beginPath(); ctx.arc(MX + player.x * scale, MY + player.y * scale, 4, 0, Math.PI * 2); ctx.fillStyle = '#10b981'; ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+                // Teammate names on minimap
+                ctx.font = "7px 'Share Tech Mono'"; ctx.fillStyle = '#38bdf8'; ctx.textAlign = 'center';
+                Object.values(teammates).forEach(tm => { if (!tm.dead) ctx.fillText(tm.name || '?', MX + tm.x * scale, MY + tm.y * scale - 5); });
+                ctx.textAlign = 'left';
             }
 
             function loop() {
                 if (!running) return;
                 frameCount++;
                 if (storm.r > storm.targetR) storm.r -= storm.shrinkRate;
+
+                // Broadcast position every 3 frames
+                posSyncTimer++;
+                if (posSyncTimer % 3 === 0) broadcastPosition();
 
                 if (!player.dead) {
                     const wx = mouseX + cam.x, wy = mouseY + cam.y;
@@ -2327,6 +2418,9 @@ motocrossx3m: {
                             if (!b.dead && Math.hypot(bu.x - b.x, bu.y - b.y) < bu.r + b.r) { b.hp -= 25 + Math.random() * 15; spawnBlood(b.x, b.y); if (b.hp <= 0) { b.dead = true; alive--; kills++; spawnBlood(b.x, b.y); } return false; }
                         }
                     }
+                    // Bots don't hurt teammates
+                    const hitTeammate = Object.values(teammates).some(tm => !tm.dead && Math.hypot(bu.x - tm.x, bu.y - tm.y) < bu.r + 14);
+                    if (hitTeammate) return false;
                     if (bu.owner === 'bot' && !player.dead && player.invincible <= 0 && Math.hypot(bu.x - player.x, bu.y - player.y) < bu.r + player.r) {
                         const dmg = 10 + Math.random() * 10;
                         if (player.shield > 0) { player.shield -= dmg; if (player.shield < 0) { player.hp += player.shield; player.shield = 0; } } else player.hp -= dmg;
@@ -2364,6 +2458,27 @@ motocrossx3m: {
                     ctx.fillStyle = '#ef4444'; ctx.fillRect(sx - bw2 / 2, sy - b.r - 14, bw2 * (b.hp / b.maxHp), 4);
                 });
 
+                // Draw teammates
+                Object.values(teammates).forEach(tm => {
+                    if (tm.dead) return;
+                    const { sx, sy } = toScreen(tm.x, tm.y);
+                    if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return;
+                    ctx.save(); ctx.translate(sx, sy); ctx.rotate((tm.angle || 0) + Math.PI / 2);
+                    ctx.shadowBlur = 16; ctx.shadowColor = '#38bdf8';
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath(); ctx.ellipse(0, 0, player.r, player.r * 1.3, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#374151'; ctx.shadowBlur = 0; ctx.fillRect(-3, -player.r * 1.3 - 12, 6, 16);
+                    ctx.restore();
+                    // Teammate name tag
+                    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(sx - 28, sy - player.r * 1.3 - 28, 56, 14);
+                    ctx.fillStyle = '#38bdf8'; ctx.font = "bold 9px 'Share Tech Mono'"; ctx.textAlign = 'center';
+                    ctx.fillText(tm.name || '?', sx, sy - player.r * 1.3 - 17);
+                    // Teammate HP bar
+                    ctx.fillStyle = '#1f2937'; ctx.fillRect(sx - 20, sy - player.r * 1.3 - 14, 40, 4);
+                    ctx.fillStyle = '#10b981'; ctx.fillRect(sx - 20, sy - player.r * 1.3 - 14, 40 * Math.max(0, (tm.hp || 100) / 100), 4);
+                    ctx.textAlign = 'left';
+                });
+
                 if (!player.dead) {
                     const { sx, sy } = toScreen(player.x, player.y);
                     const flash = player.invincible > 0 && Math.floor(player.invincible / 3) % 2 === 0;
@@ -2372,6 +2487,10 @@ motocrossx3m: {
                     ctx.beginPath(); ctx.ellipse(0, 0, player.r, player.r * 1.3, 0, 0, Math.PI * 2); ctx.fill();
                     ctx.fillStyle = '#374151'; ctx.shadowBlur = 0; ctx.fillRect(-3, -player.r * 1.3 - 12, 6, 16);
                     ctx.fillStyle = '#064e3b'; ctx.fillRect(player.r - 4, -8, 8, 12); ctx.restore();
+                    // Player name tag
+                    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(sx - 28, sy - player.r * 1.3 - 28, 56, 14);
+                    ctx.fillStyle = '#10b981'; ctx.font = "bold 9px 'Share Tech Mono'"; ctx.textAlign = 'center';
+                    ctx.fillText(player.name, sx, sy - player.r * 1.3 - 17); ctx.textAlign = 'left';
                     ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1;
                     ctx.beginPath(); ctx.moveTo(mouseX - 10, mouseY); ctx.lineTo(mouseX + 10, mouseY); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(mouseX, mouseY - 10); ctx.lineTo(mouseX, mouseY + 10); ctx.stroke();
@@ -2397,6 +2516,22 @@ motocrossx3m: {
                 ctx.fillText(player.reloading ? 'RELOADING...' : `🔶 ${player.ammo}/${player.maxAmmo}`, W - 16, 26);
                 ctx.fillStyle = '#64748b'; ctx.font = "11px 'Share Tech Mono'"; ctx.fillText('CLICK to shoot · R reload · WASD move', W - 16, 43);
                 ctx.textAlign = 'left';
+
+                // Team panel (bottom left)
+                const tmList = Object.values(teammates);
+                if (tmList.length > 0) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(12, H - 50 - tmList.length * 34, 160, tmList.length * 34 + 4);
+                    tmList.forEach((tm, i) => {
+                        const ty = H - 46 - (tmList.length - 1 - i) * 34;
+                        ctx.fillStyle = tm.dead ? '#ef4444' : '#38bdf8';
+                        ctx.font = "bold 10px 'Share Tech Mono'"; ctx.textAlign = 'left';
+                        ctx.fillText((tm.dead ? '💀 ' : '🤝 ') + (tm.name || 'Teammate'), 18, ty);
+                        if (!tm.dead) {
+                            ctx.fillStyle = '#1f2937'; ctx.fillRect(18, ty + 4, 140, 6);
+                            ctx.fillStyle = '#10b981'; ctx.fillRect(18, ty + 4, 140 * Math.max(0, (tm.hp || 0) / 100), 6);
+                        }
+                    });
+                }
 
                 const pDist = Math.hypot(player.x - storm.cx, player.y - storm.cy);
                 if (pDist > storm.r - 120) { ctx.fillStyle = 'rgba(124,58,237,0.85)'; ctx.fillRect(W / 2 - 100, H - 40, 200, 28); ctx.fillStyle = '#fff'; ctx.font = "bold 12px 'Share Tech Mono'"; ctx.textAlign = 'center'; ctx.fillText('⚠ STORM APPROACHING', W / 2, H - 22); ctx.textAlign = 'left'; }
