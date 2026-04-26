@@ -380,7 +380,7 @@
             background: linear-gradient(135deg, rgba(8,12,23,0.97), rgba(17,24,39,0.95));
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             z-index: 100;
             padding: 30px;
@@ -1700,6 +1700,7 @@
             'https://pzmfsbajmntwvvvxdlra.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWZzYmFqbW50d3Z2dnhkbHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTUyOTEsImV4cCI6MjA5MjEzMTI5MX0.VSX10eIB7abkAgjh1Bf3WDFfOm8vmMEqS1LVDkuopZE'
         );
+        window.sb = sb; // expose globally for games.js party system
         emailjs.init("jrgaySZUJkXugz5TV");
 
         // ── State ─────────────────────────────────────────────────────────────
@@ -1727,6 +1728,7 @@
             currentUser = user;
             const { data } = await sb.from('profiles').select('xp, username').eq('id', user.id).single();
             totalXP = data?.xp || 0;
+            if (data?.username) window._currentUsername = data.username;
             updateXPDisplay();
         }
 
