@@ -2259,23 +2259,30 @@ motocrossx3m: {
             };
 
             // ── TEAM POSITION SYNC ────────────────────────────────────────────
-            let posChannel = null;
-            if (channel && partyMembers.length > 1) {
-                // Reuse or create a position sync channel
-                posChannel = sbClient.channel(`pos-${partyCode}`, { config: { broadcast: { self: false } } });
-                posChannel
-                    .on('broadcast', { event: 'pos' }, ({ payload }) => {
-                        if (payload.name && payload.name !== player.name) {
-                            teammates[payload.name] = { x: payload.x, y: payload.y, angle: payload.angle, hp: payload.hp, dead: payload.dead, name: payload.name };
-                        }
-                    })
-                    .subscribe();
-            }
+            // Always create pos channel — works for any party size
+            // Use partyCode if in party, else a throwaway solo code
+            const posChanName = partyCode ? `pos-${partyCode}` : `pos-solo-${Math.random().toString(36).slice(2)}`;
+            const posChannel = sbClient.channel(posChanName, { config: { broadcast: { self: false } } });
+            posChannel
+                .on('broadcast', { event: 'pos' }, ({ payload }) => {
+                    if (payload.name && payload.name !== player.name) {
+                        teammates[payload.name] = {
+                            x: payload.x, y: payload.y,
+                            angle: payload.angle, hp: payload.hp,
+                            dead: payload.dead, name: payload.name
+                        };
+                    }
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') broadcastPosition();
+                });
 
             let posSyncTimer = 0;
             function broadcastPosition() {
-                if (!posChannel) return;
-                posChannel.send({ type: 'broadcast', event: 'pos', payload: { name: player.name, x: player.x, y: player.y, angle: player.angle, hp: player.hp, dead: player.dead } });
+                posChannel.send({ type: 'broadcast', event: 'pos', payload: {
+                    name: player.name, x: player.x, y: player.y,
+                    angle: player.angle, hp: player.hp, dead: player.dead
+                }});
             }
 
             window._gameCleanup = () => {
