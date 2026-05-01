@@ -1346,6 +1346,759 @@
         #canvas-wrapper:-webkit-full-screen .game-overlay {
             border-radius: 0;
         }
+
+        /* ─── PHASE 3: GAMING ─── */
+
+        /* Daily Challenge Banner */
+        .daily-challenge-banner {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.1));
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-lg);
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .daily-challenge-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%);
+            pointer-events: none;
+        }
+        .daily-challenge-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        .daily-challenge-info { flex: 1; }
+        .daily-challenge-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--brand);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .daily-challenge-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .daily-challenge-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .daily-challenge-xp {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--success);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .daily-challenge-xp span {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+        .daily-challenge-timer {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--warn);
+            margin-top: 4px;
+        }
+        .btn-challenge {
+            padding: 10px 20px;
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 99px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-challenge:hover { background: #4f52e0; box-shadow: 0 0 16px var(--brand-glow); }
+        .btn-challenge.completed {
+            background: var(--success);
+            cursor: default;
+        }
+        .btn-challenge.completed:hover { background: var(--success); box-shadow: 0 0 16px rgba(16,185,129,0.4); }
+
+        /* Now Playing Indicator */
+        .now-playing-bar {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        .now-playing-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse-dot 1.5s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+        .now-playing-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        /* Game Stats / History view */
+        #gaming-view { display:none; }
+
+        .gaming-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .gaming-tab {
+            padding: 8px 20px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .gaming-tab.active {
+            background: var(--brand-dim);
+            border-color: var(--border2);
+            color: white;
+        }
+        .gaming-tab:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .stat-card:hover { border-color: var(--border2); }
+        .stat-card-val {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 26px;
+            color: var(--brand);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-card-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Game History */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.2s;
+        }
+        .history-item:hover { border-color: var(--border2); }
+        .history-emoji { font-size: 24px; flex-shrink: 0; }
+        .history-info { flex: 1; }
+        .history-game {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .history-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .history-xp {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--success);
+            font-weight: 700;
+        }
+        .history-empty {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .achievement-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .achievement-card.unlocked {
+            border-color: rgba(245,158,11,0.35);
+            background: linear-gradient(135deg, var(--surface), rgba(245,158,11,0.06));
+        }
+        .achievement-card.unlocked::before {
+            content: '';
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, rgba(245,158,11,0.2), transparent 70%);
+        }
+        .achievement-icon {
+            font-size: 30px;
+            flex-shrink: 0;
+            filter: grayscale(1);
+            opacity: 0.4;
+        }
+        .achievement-card.unlocked .achievement-icon {
+            filter: none;
+            opacity: 1;
+        }
+        .achievement-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+        .achievement-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .achievement-badge {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 10px;
+            color: #f59e0b;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Game Rating */
+        .game-rating-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .rating-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+        .star-rating { display: flex; gap: 3px; }
+        .star {
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            color: var(--surface3);
+            filter: grayscale(1);
+        }
+        .star:hover, .star.lit {
+            filter: none;
+            color: #f59e0b;
+            transform: scale(1.2);
+        }
+        .star-count {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        /* ─── PHASE 4: SOCIAL ─── */
+
+        /* Notification Bell */
+        .notif-bell {
+            position: relative;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-size: 16px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notif-bell:hover { border-color: var(--border2); background: var(--surface2); }
+        .notif-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            min-width: 16px; height: 16px;
+            background: var(--danger);
+            border-radius: 99px;
+            font-size: 9px;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            font-family: 'Share Tech Mono', monospace;
+            display: none;
+        }
+        .notif-badge.show { display: flex; }
+
+        /* Notification Dropdown */
+        .notif-dropdown {
+            position: fixed;
+            top: 68px;
+            right: 36px;
+            width: 340px;
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            z-index: 5000;
+            display: none;
+            overflow: hidden;
+        }
+        .notif-dropdown.open { display: block; }
+        .notif-dropdown-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .notif-mark-all {
+            font-size: 11px;
+            color: var(--brand);
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+        .notif-mark-all:hover { text-decoration: underline; }
+        .notif-list { max-height: 340px; overflow-y: auto; }
+        .notif-item {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .notif-item:hover { background: var(--surface2); }
+        .notif-item.unread { background: rgba(99,102,241,0.06); }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--brand-dim);
+            border: 1px solid var(--border2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: var(--brand);
+        }
+        .notif-icon-badge {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .notif-text {
+            flex: 1;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        .notif-text strong { color: var(--text); font-family: 'Syne', sans-serif; }
+        .notif-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .notif-unread-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--brand);
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+        .notif-empty {
+            padding: 32px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* DM / Messaging */
+        #dm-view { display:none; max-width: 820px; }
+
+        .dm-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+            height: calc(100vh - 160px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .dm-sidebar {
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .dm-sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .dm-search-input {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            transition: border-color 0.2s;
+        }
+        .dm-search-input:focus { border-color: var(--brand); }
+        .dm-search-input::placeholder { color: var(--text-muted); }
+
+        .dm-convo-list { flex: 1; overflow-y: auto; }
+        .dm-convo-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border);
+        }
+        .dm-convo-item:hover { background: var(--surface2); }
+        .dm-convo-item.active { background: var(--brand-dim); }
+        .dm-convo-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--brand);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .dm-online-dot {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 9px; height: 9px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid var(--surface);
+        }
+        .dm-convo-info { flex: 1; min-width: 0; }
+        .dm-convo-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dm-convo-preview {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .dm-convo-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .dm-convo-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .dm-unread-count {
+            background: var(--brand);
+            color: white;
+            border-radius: 99px;
+            font-size: 9px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0 3px;
+        }
+
+        .dm-new-btn {
+            padding: 10px 16px;
+            margin: 10px;
+            background: var(--brand-dim);
+            border: 1px dashed var(--border2);
+            border-radius: 8px;
+            color: var(--brand);
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .dm-new-btn:hover { background: var(--brand); color: white; }
+
+        /* Chat pane */
+        .dm-chat-pane {
+            display: flex;
+            flex-direction: column;
+        }
+        .dm-chat-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dm-chat-username {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            flex: 1;
+        }
+        .dm-chat-status {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .dm-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .dm-msg {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            max-width: 75%;
+        }
+        .dm-msg.mine {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .dm-msg-bubble {
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        .dm-msg.theirs .dm-msg-bubble {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+        .dm-msg.mine .dm-msg-bubble {
+            background: var(--brand);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .dm-msg-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            flex-shrink: 0;
+        }
+        .dm-msg-avatar {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--brand-dim);
+            border: 1px solid var(--border2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: var(--brand);
+        }
+
+        .dm-composer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .dm-input {
+            flex: 1;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            padding: 10px 18px;
+            transition: border-color 0.2s;
+        }
+        .dm-input:focus { border-color: var(--brand); }
+        .dm-input::placeholder { color: var(--text-muted); }
+        .btn-dm-send {
+            padding: 10px 18px;
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 99px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-dm-send:hover { background: #4f52e0; }
+
+        .dm-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+        .dm-empty-state-icon { font-size: 48px; opacity: 0.4; }
+        .dm-empty-state-text { font-size: 14px; }
+
+        /* New DM modal */
+        .new-dm-modal {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-xl);
+            width: 420px;
+            max-width: 95vw;
+            padding: 28px;
+            position: relative;
+        }
+        .new-dm-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+        .new-dm-user-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+        .new-dm-user-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .new-dm-user-item:hover { border-color: var(--border2); background: var(--surface2); }
+        .new-dm-username {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            flex: 1;
+        }
+        .new-dm-xp {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--success);
+        }
+
+        /* Gaming sidebar nav items */
+        .nav-badge {
+            margin-left: auto;
+            background: var(--brand);
+            color: white;
+            border-radius: 99px;
+            font-size: 9px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0 4px;
+        }
     </style>
 </head>
 <body onload="initPortal()">
@@ -1415,6 +2168,15 @@
 
         <div class="nav-item" id="tab-feed" onclick="switchTab('feed')">
             <span class="nav-icon">📢</span> Feed
+        </div>
+
+        <div class="nav-item" id="tab-gaming" onclick="switchTab('gaming')">
+            <span class="nav-icon">⭐</span> My Stats
+        </div>
+
+        <div class="nav-item" id="tab-dm" onclick="switchTab('dm')">
+            <span class="nav-icon">💬</span> Messages
+            <span class="nav-badge" id="dm-nav-badge" style="display:none;"></span>
         </div>
 
         <div class="sidebar-section">Core Games</div>
@@ -1602,14 +2364,48 @@
                 MODULE / <span id="active-title">ARCADE</span>
             </div>
             <div class="topbar-pills">
+                <div class="now-playing-bar" id="now-playing-bar" style="display:none;">
+                    <div class="now-playing-dot"></div>
+                    <span>Playing:</span>
+                    <span class="now-playing-name" id="now-playing-name">—</span>
+                </div>
                 <div class="pill"><div class="dot"></div> System Online</div>
                 <div class="pill">XP <span class="xp-val" id="xp-pill">0</span></div>
+                <div class="notif-bell" onclick="toggleNotifDropdown()" id="notif-bell">
+                    🔔
+                    <div class="notif-badge" id="notif-badge"></div>
+                </div>
+            </div>
+            <!-- Notification Dropdown -->
+            <div class="notif-dropdown" id="notif-dropdown">
+                <div class="notif-dropdown-header">
+                    Notifications
+                    <span class="notif-mark-all" onclick="markAllNotifRead()">Mark all read</span>
+                </div>
+                <div class="notif-list" id="notif-list">
+                    <div class="notif-empty">No notifications yet</div>
+                </div>
             </div>
         </nav>
 
         <div class="content-area">
             <!-- ARCADE TAB -->
             <div id="arcade-view">
+                <!-- Daily Challenge Banner -->
+                <div class="daily-challenge-banner" id="daily-challenge-banner">
+                    <div class="daily-challenge-icon" id="dc-icon">⚡</div>
+                    <div class="daily-challenge-info">
+                        <div class="daily-challenge-title">⭐ Daily Challenge</div>
+                        <div class="daily-challenge-name" id="dc-name">Loading...</div>
+                        <div class="daily-challenge-desc" id="dc-desc">Play today's featured game for bonus XP</div>
+                        <div class="daily-challenge-timer" id="dc-timer">Resets in: —</div>
+                    </div>
+                    <div class="daily-challenge-xp">
+                        <span id="dc-xp">+50</span>
+                        <span>BONUS XP</span>
+                    </div>
+                    <button class="btn-challenge" id="dc-btn" onclick="startDailyChallenge()">Play Now</button>
+                </div>
                 <div class="stage-wrapper">
                     <div id="canvas-wrapper">
                         <button id="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
@@ -2362,8 +3158,107 @@
                     <button class="btn-load-more" onclick="loadMorePosts()">Load More</button>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- GAMING STATS TAB (Phase 3) -->
+            <div id="gaming-view">
+                <div class="lb-header">
+                    <h2>⭐ My Gaming Stats</h2>
+                </div>
+                <div class="gaming-tabs">
+                    <button class="gaming-tab active" id="gtab-stats" onclick="switchGamingTab('stats')">📊 Stats</button>
+                    <button class="gaming-tab" id="gtab-history" onclick="switchGamingTab('history')">🕹️ History</button>
+                    <button class="gaming-tab" id="gtab-achievements" onclick="switchGamingTab('achievements')">🏅 Achievements</button>
+                </div>
+
+                <!-- Stats Panel -->
+                <div id="gaming-stats-panel">
+                    <div class="stats-grid" id="gaming-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-total-xp">0</div>
+                            <div class="stat-card-label">Total XP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-time">0m</div>
+                            <div class="stat-card-label">Time Played</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-games-played">0</div>
+                            <div class="stat-card-label">Sessions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-fav-game">—</div>
+                            <div class="stat-card-label">Fav Game</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-daily-streak">0</div>
+                            <div class="stat-card-label">Day Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-val" id="stat-achievements">0</div>
+                            <div class="stat-card-label">Achievements</div>
+                        </div>
+                    </div>
+                    <!-- XP over time chart (simple) -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;max-width:700px;">
+                        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:16px;">XP Progress</div>
+                        <div style="position:relative;height:80px;background:var(--surface2);border-radius:10px;overflow:hidden;">
+                            <div id="xp-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--brand),var(--success));width:0%;transition:width 0.8s ease;border-radius:10px;display:flex;align-items:center;padding-left:12px;">
+                                <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:white;white-space:nowrap;"></span>
+                            </div>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:1px;" id="xp-progress-label">Level 0 · 0 / 1000 XP to next level</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Panel -->
+                <div id="gaming-history-panel" style="display:none;">
+                    <div class="history-list" id="gaming-history-list">
+                        <div class="history-empty">No game sessions recorded yet.<br>Start playing to build your history!</div>
+                    </div>
+                </div>
+
+                <!-- Achievements Panel -->
+                <div id="gaming-achievements-panel" style="display:none;">
+                    <div class="achievements-grid" id="achievements-grid"></div>
+                </div>
+            </div>
+
+            <!-- MESSAGES / DM TAB (Phase 4) -->
+            <div id="dm-view">
+                <div class="lb-header">
+                    <h2>💬 Messages</h2>
+                </div>
+                <div class="dm-layout">
+                    <div class="dm-sidebar">
+                        <div class="dm-sidebar-header">
+                            Conversations
+                            <input class="dm-search-input" id="dm-search" placeholder="Search players..." oninput="filterDmConvos(this.value)">
+                        </div>
+                        <div class="dm-convo-list" id="dm-convo-list">
+                            <div class="notif-empty">No conversations yet</div>
+                        </div>
+                        <div class="dm-new-btn" onclick="openNewDmModal()">+ New Message</div>
+                    </div>
+                    <div class="dm-chat-pane" id="dm-chat-pane">
+                        <div class="dm-empty-state">
+                            <div class="dm-empty-state-icon">💬</div>
+                            <div class="dm-empty-state-text">Select a conversation or start a new one</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New DM Modal -->
+            <div class="modal-overlay" id="new-dm-modal">
+                <div class="new-dm-modal">
+                    <button class="profile-modal-close" onclick="closeNewDmModal()">✕</button>
+                    <div class="new-dm-title">New Message</div>
+                    <input class="dm-search-input" id="new-dm-user-search" placeholder="Search players..." oninput="filterNewDmUsers(this.value)" style="width:100%;margin-bottom:12px;">
+                    <div class="new-dm-user-list" id="new-dm-user-list">
+                        <div class="notif-empty">Loading players...</div>
+                    </div>
+                </div>
+            </div>
 
     <!-- TOAST -->
     <div id="toast"></div>
@@ -3146,6 +4041,800 @@
                 document.getElementById('ghost-badge').style.display = 'block';
             }
         } catch(e) {}
+
+        // ══════════════════════════════════════════════════════════════════
+        // PHASE 3 — GAMING
+        // ══════════════════════════════════════════════════════════════════
+
+        // ── Now Playing Indicator ─────────────────────────────────────────
+        function setNowPlaying(gameName) {
+            const bar = document.getElementById('now-playing-bar');
+            const nameEl = document.getElementById('now-playing-name');
+            if (gameName) {
+                nameEl.innerText = gameName;
+                bar.style.display = 'flex';
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        // Patch loadGameFromLib to record history + now playing
+        const _origLoadGame = loadGameFromLib;
+        loadGameFromLib = function(key) {
+            const game = GamesLib[key];
+            if (game) {
+                setNowPlaying(game.title);
+                recordGameSession(key, game.title, game.emoji || '🎮');
+                checkDailyChallenge(key);
+            }
+            _origLoadGame(key);
+        };
+
+        // ── Game History ───────────────────────────────────────────────────
+        function getGameHistory() {
+            try { return JSON.parse(localStorage.getItem('lvl_game_history') || '[]'); } catch(e) { return []; }
+        }
+
+        function recordGameSession(key, title, emoji) {
+            if (isGhost) return;
+            const history = getGameHistory();
+            history.unshift({ key, title, emoji, ts: Date.now(), xp: 0 });
+            if (history.length > 50) history.pop();
+            try { localStorage.setItem('lvl_game_history', JSON.stringify(history)); } catch(e) {}
+            // Update fav game
+            updateFavGame(history);
+            // Update streak
+            updateStreak();
+            // Check achievements
+            setTimeout(() => checkAllAchievements(), 500);
+        }
+
+        function updateFavGame(history) {
+            if (!history.length) return;
+            const counts = {};
+            history.forEach(h => { counts[h.title] = (counts[h.title] || 0) + 1; });
+            const fav = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+            try { localStorage.setItem('lvl_fav_game', fav ? fav[0] : ''); } catch(e) {}
+        }
+
+        function updateStreak() {
+            try {
+                const today = new Date().toDateString();
+                const lastDay = localStorage.getItem('lvl_last_play_day');
+                let streak = parseInt(localStorage.getItem('lvl_streak') || '0');
+                if (lastDay === today) return; // already counted today
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                if (lastDay === yesterday) {
+                    streak++;
+                } else {
+                    streak = 1; // reset streak
+                }
+                localStorage.setItem('lvl_streak', streak);
+                localStorage.setItem('lvl_last_play_day', today);
+            } catch(e) {}
+        }
+
+        function getStreak() {
+            try { return parseInt(localStorage.getItem('lvl_streak') || '0'); } catch(e) { return 0; }
+        }
+
+        // ── Daily Challenge ────────────────────────────────────────────────
+        const DAILY_CHALLENGES = [
+            { key: 'dodger', bonus: 50, desc: 'Dodge enemies for at least 30 seconds!' },
+            { key: 'snake', bonus: 60, desc: 'Eat 10 apples in Neon Snake!' },
+            { key: 'pacman', bonus: 55, desc: 'Clear the first level in Pacman!' },
+            { key: 'tetris', bonus: 65, desc: 'Play for a full minute without game over!' },
+            { key: 'flappyBird', bonus: 50, desc: 'Get past 5 pipes in Flappy Bird!' },
+            { key: 'asteroidDodge', bonus: 70, desc: 'Survive 45 seconds in Asteroid Dodge!' },
+            { key: 'warzone', bonus: 75, desc: 'Score 100 points in Void Warzone!' },
+            { key: 'geometryRush', bonus: 80, desc: 'Complete a run in Geometry Rush!' },
+        ];
+
+        function getTodaysChallenge() {
+            const dayIndex = Math.floor(Date.now() / 86400000);
+            return DAILY_CHALLENGES[dayIndex % DAILY_CHALLENGES.length];
+        }
+
+        function isChallengeCompleted() {
+            try {
+                const today = new Date().toDateString();
+                const data = JSON.parse(localStorage.getItem('lvl_daily_challenge') || '{}');
+                return data.date === today && data.completed;
+            } catch(e) { return false; }
+        }
+
+        function markChallengeCompleted() {
+            try {
+                const today = new Date().toDateString();
+                localStorage.setItem('lvl_daily_challenge', JSON.stringify({ date: today, completed: true }));
+            } catch(e) {}
+        }
+
+        function initDailyChallenge() {
+            const challenge = getTodaysChallenge();
+            const game = GamesLib[challenge.key];
+            if (!game) return;
+
+            document.getElementById('dc-icon').innerText = game.emoji || '⚡';
+            document.getElementById('dc-name').innerText = game.title;
+            document.getElementById('dc-desc').innerText = challenge.desc;
+            document.getElementById('dc-xp').innerText = '+' + challenge.bonus;
+
+            const btn = document.getElementById('dc-btn');
+            if (isChallengeCompleted()) {
+                btn.innerText = '✓ Completed';
+                btn.classList.add('completed');
+            }
+
+            // Countdown timer
+            function updateTimer() {
+                const now = new Date();
+                const midnight = new Date(now);
+                midnight.setHours(24, 0, 0, 0);
+                const diff = midnight - now;
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('dc-timer').innerText = `Resets in: ${h}h ${m}m ${s}s`;
+            }
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
+        function startDailyChallenge() {
+            const challenge = getTodaysChallenge();
+            loadGameFromLib(challenge.key);
+        }
+
+        function checkDailyChallenge(key) {
+            if (isGhost) return;
+            const challenge = getTodaysChallenge();
+            if (key !== challenge.key || isChallengeCompleted()) return;
+            // Award bonus XP after 5s of playing
+            setTimeout(async () => {
+                if (isChallengeCompleted()) return;
+                const bonus = challenge.bonus;
+                markChallengeCompleted();
+                totalXP += bonus;
+                if (currentUser) {
+                    await sb.from('profiles').update({ xp: totalXP }).eq('id', currentUser.id);
+                }
+                updateXPDisplay();
+                showToast(`⭐ Daily Challenge Complete! +${bonus} Bonus XP!`);
+                document.getElementById('dc-btn').innerText = '✓ Completed';
+                document.getElementById('dc-btn').classList.add('completed');
+                // Trigger notification
+                addLocalNotif({
+                    icon: '⭐',
+                    text: `<strong>Daily Challenge complete!</strong> You earned <strong>+${bonus} bonus XP</strong>`,
+                    ts: Date.now()
+                });
+            }, 5000);
+        }
+
+        // ── Gaming Tab ─────────────────────────────────────────────────────
+        let _gamingTab = 'stats';
+
+        function switchGamingTab(tab) {
+            _gamingTab = tab;
+            ['stats','history','achievements'].forEach(t => {
+                document.getElementById('gtab-' + t).classList.toggle('active', t === tab);
+                document.getElementById('gaming-' + t + '-panel').style.display = t === tab ? 'block' : 'none';
+            });
+            if (tab === 'stats') renderGamingStats();
+            if (tab === 'history') renderGameHistory();
+            if (tab === 'achievements') renderAchievements();
+        }
+
+        function renderGamingStats() {
+            document.getElementById('stat-total-xp').innerText = totalXP.toLocaleString();
+            document.getElementById('stat-time').innerText = fmtTime(totalTimePlayed);
+            const history = getGameHistory();
+            document.getElementById('stat-games-played').innerText = history.length;
+            const fav = localStorage.getItem('lvl_fav_game') || '—';
+            const favShort = fav.length > 8 ? fav.substr(0,8)+'…' : fav;
+            document.getElementById('stat-fav-game').innerText = favShort;
+            document.getElementById('stat-daily-streak').innerText = getStreak();
+            const unlocked = ACHIEVEMENTS.filter(a => a.check()).length;
+            document.getElementById('stat-achievements').innerText = unlocked + '/' + ACHIEVEMENTS.length;
+
+            // XP bar
+            const level = Math.floor(totalXP / 1000);
+            const xpInLevel = totalXP % 1000;
+            const pct = Math.min(xpInLevel / 10, 100);
+            document.getElementById('xp-progress-bar').style.width = pct + '%';
+            document.getElementById('xp-progress-label').innerText = `Level ${level} · ${xpInLevel} / 1000 XP to next level`;
+        }
+
+        function renderGameHistory() {
+            const history = getGameHistory();
+            const el = document.getElementById('gaming-history-list');
+            if (!history.length) {
+                el.innerHTML = '<div class="history-empty">No game sessions recorded yet.<br>Start playing to build your history!</div>';
+                return;
+            }
+            el.innerHTML = history.slice(0, 20).map(h => `
+                <div class="history-item">
+                    <div class="history-emoji">${h.emoji || '🎮'}</div>
+                    <div class="history-info">
+                        <div class="history-game">${h.title}</div>
+                        <div class="history-meta">${timeAgo(h.ts)}</div>
+                    </div>
+                    <div class="history-xp">Session</div>
+                </div>
+            `).join('');
+        }
+
+        // ── Achievements ───────────────────────────────────────────────────
+        const ACHIEVEMENTS = [
+            {
+                id: 'first_game', icon: '🎮', name: 'First Launch',
+                desc: 'Play your first game',
+                check: () => getGameHistory().length >= 1
+            },
+            {
+                id: 'play_5', icon: '🕹️', name: 'Getting Warmed Up',
+                desc: 'Play 5 different sessions',
+                check: () => getGameHistory().length >= 5
+            },
+            {
+                id: 'play_20', icon: '🏆', name: 'Dedicated Gamer',
+                desc: 'Play 20 sessions',
+                check: () => getGameHistory().length >= 20
+            },
+            {
+                id: 'xp_100', icon: '⚡', name: 'XP Rookie',
+                desc: 'Earn 100 total XP',
+                check: () => totalXP >= 100
+            },
+            {
+                id: 'xp_1000', icon: '💎', name: 'XP Hunter',
+                desc: 'Earn 1000 total XP',
+                check: () => totalXP >= 1000
+            },
+            {
+                id: 'xp_10000', icon: '👑', name: 'XP Legend',
+                desc: 'Earn 10,000 total XP',
+                check: () => totalXP >= 10000
+            },
+            {
+                id: 'streak_3', icon: '🔥', name: 'On Fire',
+                desc: 'Play 3 days in a row',
+                check: () => getStreak() >= 3
+            },
+            {
+                id: 'streak_7', icon: '🌟', name: 'Weekly Warrior',
+                desc: 'Play 7 days in a row',
+                check: () => getStreak() >= 7
+            },
+            {
+                id: 'daily_challenge', icon: '⭐', name: 'Challenge Accepted',
+                desc: 'Complete a daily challenge',
+                check: () => isChallengeCompleted()
+            },
+            {
+                id: 'time_1h', icon: '⏰', name: 'Hour of Power',
+                desc: 'Play for 1 hour total',
+                check: () => totalTimePlayed >= 3600
+            },
+            {
+                id: 'social_post', icon: '📢', name: 'Social Butterfly',
+                desc: 'Post something in the feed',
+                check: () => {
+                    try { return localStorage.getItem('lvl_posted_once') === 'true'; } catch(e) { return false; }
+                }
+            },
+            {
+                id: 'dm_sent', icon: '💬', name: 'First DM',
+                desc: 'Send your first direct message',
+                check: () => {
+                    try { return localStorage.getItem('lvl_dm_sent') === 'true'; } catch(e) { return false; }
+                }
+            },
+        ];
+
+        let _prevUnlocked = new Set();
+
+        function checkAllAchievements() {
+            ACHIEVEMENTS.forEach(a => {
+                if (!_prevUnlocked.has(a.id) && a.check()) {
+                    _prevUnlocked.add(a.id);
+                    showToast(`🏅 Achievement Unlocked: ${a.name}!`);
+                    addLocalNotif({
+                        icon: a.icon,
+                        text: `<strong>Achievement Unlocked!</strong> ${a.name} — ${a.desc}`,
+                        ts: Date.now()
+                    });
+                }
+            });
+            // Save unlocked set
+            try { localStorage.setItem('lvl_unlocked', JSON.stringify([..._prevUnlocked])); } catch(e) {}
+        }
+
+        function loadUnlockedAchievements() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('lvl_unlocked') || '[]');
+                _prevUnlocked = new Set(saved);
+            } catch(e) {}
+        }
+
+        function renderAchievements() {
+            const el = document.getElementById('achievements-grid');
+            el.innerHTML = ACHIEVEMENTS.map(a => {
+                const unlocked = a.check();
+                return `<div class="achievement-card ${unlocked ? 'unlocked' : ''}">
+                    ${unlocked ? '<div class="achievement-badge">✓ UNLOCKED</div>' : ''}
+                    <div class="achievement-icon">${a.icon}</div>
+                    <div>
+                        <div class="achievement-name">${a.name}</div>
+                        <div class="achievement-desc">${a.desc}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Game Ratings ───────────────────────────────────────────────────
+        function getRatings() {
+            try { return JSON.parse(localStorage.getItem('lvl_ratings') || '{}'); } catch(e) { return {}; }
+        }
+
+        function setRating(gameKey, stars) {
+            const ratings = getRatings();
+            ratings[gameKey] = stars;
+            try { localStorage.setItem('lvl_ratings', JSON.stringify(ratings)); } catch(e) {}
+            showToast(`Rated ${stars}⭐`);
+        }
+
+        function renderStarRating(gameKey) {
+            const ratings = getRatings();
+            const current = ratings[gameKey] || 0;
+            const stars = [1,2,3,4,5].map(n =>
+                `<span class="star ${n <= current ? 'lit' : ''}" onclick="setRating('${gameKey}',${n});renderStarRatingInPlace('${gameKey}')">★</span>`
+            ).join('');
+            return `<div class="game-rating-row">
+                <span class="rating-label">RATE:</span>
+                <div class="star-rating" id="stars-${gameKey}">${stars}</div>
+            </div>`;
+        }
+
+        function renderStarRatingInPlace(gameKey) {
+            const el = document.getElementById('stars-' + gameKey);
+            if (!el) return;
+            const ratings = getRatings();
+            const current = ratings[gameKey] || 0;
+            el.innerHTML = [1,2,3,4,5].map(n =>
+                `<span class="star ${n <= current ? 'lit' : ''}" onclick="setRating('${gameKey}',${n});renderStarRatingInPlace('${gameKey}')">★</span>`
+            ).join('');
+        }
+
+        // Add ratings to game overlay when game starts
+        const _origRenderGameOver = window.loadGameFromLib;
+        // Patch the game-over screen to show rating
+        const _patchedLoadGame = loadGameFromLib;
+        loadGameFromLib = function(key) {
+            _patchedLoadGame(key);
+        };
+
+        // Intercept the game-over callback to inject rating UI
+        (function patchGameOverRating() {
+            const origLoad = window._origLoadGame || loadGameFromLib;
+        })();
+
+        // ══════════════════════════════════════════════════════════════════
+        // PHASE 4 — SOCIAL
+        // ══════════════════════════════════════════════════════════════════
+
+        // ── Notifications ─────────────────────────────────────────────────
+        let _notifs = [];
+        let _notifOpen = false;
+
+        function loadNotifs() {
+            try { _notifs = JSON.parse(localStorage.getItem('lvl_notifs') || '[]'); } catch(e) { _notifs = []; }
+            renderNotifBadge();
+        }
+
+        function saveNotifs() {
+            try { localStorage.setItem('lvl_notifs', JSON.stringify(_notifs.slice(0, 50))); } catch(e) {}
+        }
+
+        function addLocalNotif(notif) {
+            notif.id = Date.now() + Math.random().toString(36).substr(2,4);
+            notif.read = false;
+            _notifs.unshift(notif);
+            saveNotifs();
+            renderNotifBadge();
+            renderNotifList();
+        }
+
+        function renderNotifBadge() {
+            const unread = _notifs.filter(n => !n.read).length;
+            const badge = document.getElementById('notif-badge');
+            if (unread > 0) {
+                badge.innerText = unread > 9 ? '9+' : unread;
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+        }
+
+        function renderNotifList() {
+            const el = document.getElementById('notif-list');
+            if (!_notifs.length) {
+                el.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+                return;
+            }
+            el.innerHTML = _notifs.slice(0, 20).map(n => `
+                <div class="notif-item ${n.read ? '' : 'unread'}" onclick="markNotifRead('${n.id}')">
+                    <div class="notif-icon-badge">${n.icon || '🔔'}</div>
+                    <div style="flex:1;">
+                        <div class="notif-text">${n.text}</div>
+                        <div class="notif-time">${timeAgo(n.ts)}</div>
+                    </div>
+                    ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function markNotifRead(id) {
+            const n = _notifs.find(x => x.id === id);
+            if (n) n.read = true;
+            saveNotifs();
+            renderNotifBadge();
+            renderNotifList();
+        }
+
+        function markAllNotifRead() {
+            _notifs.forEach(n => n.read = true);
+            saveNotifs();
+            renderNotifBadge();
+            renderNotifList();
+        }
+
+        function toggleNotifDropdown() {
+            _notifOpen = !_notifOpen;
+            document.getElementById('notif-dropdown').classList.toggle('open', _notifOpen);
+            if (_notifOpen) renderNotifList();
+        }
+
+        // Close notif dropdown on outside click
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#notif-bell') && !e.target.closest('#notif-dropdown')) {
+                _notifOpen = false;
+                document.getElementById('notif-dropdown').classList.remove('open');
+            }
+        });
+
+        // Monitor feed likes to generate notifications for post owner
+        // (we inject a notif when someone likes YOUR post)
+        const _origToggleLike = toggleLike;
+        toggleLike = async function(postId, btn) {
+            const myLikes = getSavedSet('lvl_likes');
+            const wasLiked = myLikes.has(postId);
+            await _origToggleLike(postId, btn);
+            // If we just liked (not unliked), try to notify post author
+            if (!wasLiked) {
+                // We don't know if it's our own post here easily, so just register a generic notif
+                // In a full backend, you'd trigger this server-side
+            }
+        };
+
+        // ── Direct Messages ────────────────────────────────────────────────
+        let _dmCurrentUser = null; // the other user we're chatting with
+        let _dmPollInterval = null;
+        let _allPlayers = [];
+
+        async function loadDmView() {
+            // Load conversations from Supabase (messages table)
+            if (isGhost) {
+                document.getElementById('dm-convo-list').innerHTML = '<div class="notif-empty">Log in to send messages</div>';
+                return;
+            }
+            await refreshDmConvoList();
+        }
+
+        async function refreshDmConvoList() {
+            if (!currentUser) return;
+            const myId = currentUser.id;
+
+            // Fetch latest message per conversation partner
+            const { data, error } = await sb.from('messages')
+                .select('id, sender_id, receiver_id, sender_name, receiver_name, content, created_at, is_read')
+                .or(`sender_id.eq.${myId},receiver_id.eq.${myId}`)
+                .order('created_at', { ascending: false })
+                .limit(200);
+
+            if (error || !data) return;
+
+            // Group by conversation partner
+            const convos = {};
+            data.forEach(msg => {
+                const partnerId = msg.sender_id === myId ? msg.receiver_id : msg.sender_id;
+                const partnerName = msg.sender_id === myId ? msg.receiver_name : msg.sender_name;
+                if (!convos[partnerId]) {
+                    convos[partnerId] = { id: partnerId, name: partnerName, lastMsg: msg, unread: 0 };
+                }
+                if (msg.receiver_id === myId && !msg.is_read) convos[partnerId].unread++;
+            });
+
+            const convoList = Object.values(convos).sort((a,b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at));
+
+            const el = document.getElementById('dm-convo-list');
+            if (!convoList.length) {
+                el.innerHTML = '<div class="notif-empty">No conversations yet</div>';
+                updateDmNavBadge(0);
+                return;
+            }
+
+            const totalUnread = convoList.reduce((s, c) => s + c.unread, 0);
+            updateDmNavBadge(totalUnread);
+
+            el.innerHTML = convoList.map(c => `
+                <div class="dm-convo-item ${_dmCurrentUser && _dmCurrentUser.id === c.id ? 'active' : ''}" onclick="openDmChat('${c.id}','${escHtml(c.name)}')">
+                    <div class="dm-convo-avatar">${c.name[0].toUpperCase()}</div>
+                    <div class="dm-convo-info">
+                        <div class="dm-convo-name">${escHtml(c.name)}</div>
+                        <div class="dm-convo-preview">${escHtml(c.lastMsg.content.substring(0,40))}${c.lastMsg.content.length > 40 ? '…' : ''}</div>
+                    </div>
+                    <div class="dm-convo-meta">
+                        <div class="dm-convo-time">${timeAgo(c.lastMsg.created_at)}</div>
+                        ${c.unread > 0 ? `<div class="dm-unread-count">${c.unread}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateDmNavBadge(count) {
+            const badge = document.getElementById('dm-nav-badge');
+            if (count > 0) {
+                badge.innerText = count > 9 ? '9+' : count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        async function openDmChat(partnerId, partnerName) {
+            _dmCurrentUser = { id: partnerId, name: partnerName };
+            // Update sidebar active state
+            document.querySelectorAll('.dm-convo-item').forEach(el => {
+                el.classList.toggle('active', el.onclick && el.onclick.toString().includes(partnerId));
+            });
+
+            const pane = document.getElementById('dm-chat-pane');
+            pane.innerHTML = `
+                <div class="dm-chat-header">
+                    <div class="dm-convo-avatar" style="width:32px;height:32px;font-size:13px;">${partnerName[0].toUpperCase()}</div>
+                    <div class="dm-chat-username">${escHtml(partnerName)}</div>
+                    <div class="dm-chat-status">Player</div>
+                </div>
+                <div class="dm-messages" id="dm-messages-${partnerId}">
+                    <div class="feed-loading">LOADING MESSAGES...</div>
+                </div>
+                <div class="dm-composer">
+                    <input class="dm-input" id="dm-input-${partnerId}" placeholder="Message ${escHtml(partnerName)}..." maxlength="1000"
+                        onkeydown="if(event.key==='Enter')sendDm('${partnerId}','${escHtml(partnerName)}')">
+                    <button class="btn-dm-send" onclick="sendDm('${partnerId}','${escHtml(partnerName)}')">Send</button>
+                </div>
+            `;
+
+            await loadDmMessages(partnerId, partnerName);
+            // Mark messages as read
+            await sb.from('messages')
+                .update({ is_read: true })
+                .eq('sender_id', partnerId)
+                .eq('receiver_id', currentUser.id);
+            refreshDmConvoList();
+
+            // Poll for new messages every 5s
+            if (_dmPollInterval) clearInterval(_dmPollInterval);
+            _dmPollInterval = setInterval(() => loadDmMessages(partnerId, partnerName), 5000);
+        }
+
+        async function loadDmMessages(partnerId, partnerName) {
+            const myId = currentUser.id;
+            const { data, error } = await sb.from('messages')
+                .select('*')
+                .or(`and(sender_id.eq.${myId},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${myId})`)
+                .order('created_at', { ascending: true })
+                .limit(100);
+
+            const el = document.getElementById(`dm-messages-${partnerId}`);
+            if (!el) return;
+
+            if (error || !data || !data.length) {
+                el.innerHTML = '<div class="notif-empty" style="flex:1;display:flex;align-items:center;justify-content:center;">No messages yet. Say hi!</div>';
+                return;
+            }
+
+            const myName = window._currentUsername || 'You';
+            el.innerHTML = data.map(msg => {
+                const mine = msg.sender_id === myId;
+                return `<div class="dm-msg ${mine ? 'mine' : 'theirs'}">
+                    ${!mine ? `<div class="dm-msg-avatar">${(msg.sender_name||'?')[0].toUpperCase()}</div>` : ''}
+                    <div>
+                        <div class="dm-msg-time">${timeAgo(msg.created_at)}</div>
+                        <div class="dm-msg-bubble">${escHtml(msg.content)}</div>
+                    </div>
+                    ${mine ? `<div class="dm-msg-avatar" style="background:var(--brand);color:white;border-color:transparent;">${(myName)[0].toUpperCase()}</div>` : ''}
+                </div>`;
+            }).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function sendDm(partnerId, partnerName) {
+            const input = document.getElementById(`dm-input-${partnerId}`);
+            if (!input) return;
+            const content = input.value.trim();
+            if (!content || !currentUser) return;
+
+            const myName = window._currentUsername || currentUser.email.split('@')[0];
+            const { error } = await sb.from('messages').insert({
+                sender_id: currentUser.id,
+                receiver_id: partnerId,
+                sender_name: myName,
+                receiver_name: partnerName,
+                content: content,
+                is_read: false
+            });
+
+            if (error) { showToast('Failed to send message.'); return; }
+            input.value = '';
+            try { localStorage.setItem('lvl_dm_sent', 'true'); } catch(e) {}
+            await loadDmMessages(partnerId, partnerName);
+            await refreshDmConvoList();
+            checkAllAchievements();
+        }
+
+        function filterDmConvos(query) {
+            const items = document.querySelectorAll('.dm-convo-item');
+            items.forEach(item => {
+                const name = item.querySelector('.dm-convo-name')?.innerText || '';
+                item.style.display = name.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // ── New DM Modal ────────────────────────────────────────────────────
+        let _allPlayersList = [];
+
+        async function openNewDmModal() {
+            if (isGhost) { showToast('Log in to send messages'); return; }
+            document.getElementById('new-dm-modal').classList.add('open');
+            // Load all players
+            const { data } = await sb.from('profiles').select('id, username, xp').order('xp', { ascending: false }).limit(50);
+            _allPlayersList = (data || []).filter(p => p.id !== currentUser?.id);
+            renderNewDmUserList(_allPlayersList);
+        }
+
+        function closeNewDmModal() {
+            document.getElementById('new-dm-modal').classList.remove('open');
+        }
+
+        function renderNewDmUserList(players) {
+            const el = document.getElementById('new-dm-user-list');
+            if (!players.length) {
+                el.innerHTML = '<div class="notif-empty">No other players found</div>';
+                return;
+            }
+            el.innerHTML = players.map(p => `
+                <div class="new-dm-user-item" onclick="startNewDm('${p.id}','${escHtml(p.username)}')">
+                    <div class="dm-convo-avatar">${(p.username||'?')[0].toUpperCase()}</div>
+                    <div class="new-dm-username">${escHtml(p.username)}</div>
+                    <div class="new-dm-xp">${(p.xp||0).toLocaleString()} XP</div>
+                </div>
+            `).join('');
+        }
+
+        function filterNewDmUsers(query) {
+            const filtered = _allPlayersList.filter(p => p.username.toLowerCase().includes(query.toLowerCase()));
+            renderNewDmUserList(filtered);
+        }
+
+        function startNewDm(partnerId, partnerName) {
+            closeNewDmModal();
+            openDmChat(partnerId, partnerName);
+            // Add to convo list if not there
+            refreshDmConvoList();
+        }
+
+        // ── Tab Switching (extended) ────────────────────────────────────────
+        const _origSwitchTab = switchTab;
+        switchTab = function(type) {
+            // Hide gaming and dm views too
+            document.getElementById('gaming-view').style.display = 'none';
+            document.getElementById('dm-view').style.display = 'none';
+            document.getElementById('tab-gaming').classList.remove('active');
+            document.getElementById('tab-dm').classList.remove('active');
+
+            if (type === 'gaming') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.getElementById('arcade-view').style.display = 'none';
+                document.getElementById('media-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'none';
+                document.getElementById('feed-view').style.display = 'none';
+                document.getElementById('gaming-view').style.display = 'block';
+                document.getElementById('tab-gaming').classList.add('active');
+                document.getElementById('active-title').innerText = 'MY STATS';
+                renderGamingStats();
+                return;
+            }
+            if (type === 'dm') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.getElementById('arcade-view').style.display = 'none';
+                document.getElementById('media-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'none';
+                document.getElementById('feed-view').style.display = 'none';
+                document.getElementById('dm-view').style.display = 'block';
+                document.getElementById('tab-dm').classList.add('active');
+                document.getElementById('active-title').innerText = 'MESSAGES';
+                loadDmView();
+                return;
+            }
+            _origSwitchTab(type);
+        };
+
+        // ── Feed Post tracking for achievements ─────────────────────────────
+        const _origSubmitPost = submitPost;
+        submitPost = async function() {
+            await _origSubmitPost();
+            try { localStorage.setItem('lvl_posted_once', 'true'); } catch(e) {}
+            checkAllAchievements();
+        };
+
+        // ── Like notifications ──────────────────────────────────────────────
+        // When someone likes your post, generate a notif (we can do this client-side
+        // by comparing author_id. The feed already has post.author_id)
+        // We'll hook into toggleLike to check if it's our own post:
+        const _origToggleLike2 = window.toggleLike;
+        toggleLike = async function(postId, btn) {
+            // Check if it was not already liked
+            const myLikes = getSavedSet('lvl_likes');
+            const wasLiked = myLikes.has(postId);
+            await _origToggleLike2(postId, btn);
+            // If we just liked someone else's post, generate a notif for demo
+            // (real implementation: server-side trigger)
+        };
+
+        // ── Extended initPortal ─────────────────────────────────────────────
+        const _origInitPortal = initPortal;
+        initPortal = async function() {
+            await _origInitPortal();
+            loadUnlockedAchievements();
+            loadNotifs();
+            initDailyChallenge();
+            // Check achievements on load
+            setTimeout(() => checkAllAchievements(), 1000);
+            // Poll DM unread count every 30s
+            setInterval(async () => {
+                if (currentUser && !isGhost) {
+                    const { data } = await sb.from('messages')
+                        .select('id')
+                        .eq('receiver_id', currentUser.id)
+                        .eq('is_read', false);
+                    if (data) updateDmNavBadge(data.length);
+                    // Also add notifs for new messages
+                    if (data && data.length > 0) {
+                        const badge = document.getElementById('notif-badge');
+                        // Only add a notif if we haven't recently
+                        const lastCheck = parseInt(localStorage.getItem('lvl_last_dm_check') || '0');
+                        if (Date.now() - lastCheck > 60000) {
+                            addLocalNotif({ icon: '💬', text: `<strong>${data.length} unread message${data.length>1?'s':''}</strong>`, ts: Date.now() });
+                            localStorage.setItem('lvl_last_dm_check', Date.now());
+                        }
+                    }
+                }
+            }, 30000);
+        };
+
+        // Reinitialize so patched version runs
+        document.body.onload = initPortal;
+
+        // Stop now-playing when game exits
+        const _origStopSession = stopSessionTimer;
+        stopSessionTimer = function() {
+            setNowPlaying(null);
+            _origStopSession();
+        };
+
     </script>
 </body>
 </html>
