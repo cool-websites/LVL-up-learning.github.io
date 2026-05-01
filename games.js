@@ -1158,10 +1158,15 @@ const GamesLib = {
 
             function init() {
                 bird = { x: W * 0.25, y: H / 2, vy: 0, angle: 0, radius: 12 };
-                pipes = []; particles = []; score = 0; frame = 0; state = 'playing';
+                pipes = []; particles = []; score = 0; frame = 0; state = 'waiting';
             }
 
-            function flap() { if (state !== 'playing') return; bird.vy = FLAP; spawnParticles(bird.x, bird.y, '#fde68a', 5); }
+            function flap() {
+                if (state === 'waiting') { state = 'playing'; }
+                if (state !== 'playing') return;
+                bird.vy = FLAP;
+                spawnParticles(bird.x, bird.y, '#fde68a', 5);
+            }
             function onKey(e) { if (e.code === 'Space' || e.code === 'ArrowUp' || e.key === 'w') { e.preventDefault(); flap(); } }
             function onClick() { flap(); }
 
@@ -1236,8 +1241,24 @@ const GamesLib = {
             init();
 
             function loop() {
-                if (state !== 'playing' && state !== 'over') return;
+                if (state !== 'playing' && state !== 'over' && state !== 'waiting') return;
                 frame++;
+                if (state === 'waiting') {
+                    // Bird gently bobs in place
+                    bird.y = H / 2 + Math.sin(frame * 0.05) * 6;
+                    bird.vy = 0; bird.angle = 0;
+                    drawBackground();
+                    drawBird();
+                    // "Click to start" prompt
+                    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                    ctx.beginPath(); ctx.roundRect(W/2 - 110, H/2 - 52, 220, 44, 10); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'center';
+                    ctx.fillText('Click or Space to Start', W/2, H/2 - 24);
+                    ctx.font = '12px monospace'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.textAlign = 'left';
+                    ctx.fillText('space / click to flap', 10, 22);
+                    animFrame = requestAnimationFrame(loop);
+                    return;
+                }
                 if (state === 'playing') {
                     bird.vy += GRAVITY; bird.y += bird.vy;
                     if (frame % PIPE_INTERVAL === 0) spawnPipe();
