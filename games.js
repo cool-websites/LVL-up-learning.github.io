@@ -1244,12 +1244,10 @@ const GamesLib = {
                 if (state !== 'playing' && state !== 'over' && state !== 'waiting') return;
                 frame++;
                 if (state === 'waiting') {
-                    // Bird gently bobs in place
                     bird.y = H / 2 + Math.sin(frame * 0.05) * 6;
                     bird.vy = 0; bird.angle = 0;
                     drawBackground();
                     drawBird();
-                    // "Click to start" prompt
                     ctx.fillStyle = 'rgba(0,0,0,0.35)';
                     ctx.beginPath(); ctx.roundRect(W/2 - 110, H/2 - 52, 220, 44, 10); ctx.fill();
                     ctx.fillStyle = '#fff'; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'center';
@@ -2579,5 +2577,14 @@ motocrossx3m: {
                 if (lo) lo.remove();
             };
         }
+    },
+
+    fnaeEpsteins: {
+        title: "Five Nights At Epstiens",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "👁️",
+        color: "linear-gradient(135deg, #0a0000, #1a0000)",
+        url: "https://qz-games.github.io/Games04/fnae/"
     },
 };
