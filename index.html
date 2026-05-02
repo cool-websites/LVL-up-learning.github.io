@@ -2099,6 +2099,143 @@
             font-family: 'Share Tech Mono', monospace;
             padding: 0 4px;
         }
+
+        /* ── GROUP CHATS ── */
+        #gc-view { display: none; }
+        .gc-layout { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 160px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+        .gc-sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .gc-sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; }
+        .gc-create-btn { font-size: 20px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+        .gc-create-btn:hover { opacity: 1; }
+        .gc-list { flex: 1; overflow-y: auto; }
+        .gc-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+        .gc-item:hover { background: var(--surface2); }
+        .gc-item.active { background: var(--brand-dim); }
+        .gc-avatar { width: 38px; height: 38px; border-radius: 12px; background: var(--brand-dim); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .gc-info { flex: 1; min-width: 0; }
+        .gc-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gc-preview { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .gc-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+        .gc-time { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-muted); }
+        .gc-unread { background: var(--brand); color: white; border-radius: 99px; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; padding: 0 3px; }
+        .gc-chat-pane { display: flex; flex-direction: column; }
+        .gc-chat-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .gc-chat-avatar { width: 32px; height: 32px; border-radius: 10px; background: var(--brand-dim); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .gc-chat-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; flex: 1; }
+        .gc-member-count { font-size: 11px; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; }
+        .gc-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .gc-msg { display: flex; gap: 8px; max-width: 80%; }
+        .gc-msg.mine { align-self: flex-end; flex-direction: row-reverse; }
+        .gc-msg-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--brand-dim); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; font-family: 'Syne', sans-serif; font-weight: 800; color: var(--brand); }
+        .gc-msg-body { display: flex; flex-direction: column; gap: 2px; }
+        .gc-msg-name { font-size: 10px; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; }
+        .gc-msg.mine .gc-msg-name { text-align: right; }
+        .gc-msg-bubble { padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-break: break-word; }
+        .gc-msg.theirs .gc-msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .gc-msg.mine .gc-msg-bubble { background: var(--brand); color: white; border-bottom-right-radius: 4px; }
+        .gc-composer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+        .gc-input { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 99px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 10px 18px; transition: border-color 0.2s; }
+        .gc-input:focus { border-color: var(--brand); outline: none; }
+        .gc-input::placeholder { color: var(--text-muted); }
+        .gc-send-btn { padding: 10px 18px; background: var(--brand); color: white; border: none; border-radius: 99px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .gc-send-btn:hover { background: #4f52e0; }
+        .gc-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; font-size: 14px; }
+        .create-gc-modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-xl); width: 440px; max-width: 95vw; padding: 28px; position: relative; }
+        .create-gc-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+        .gc-form-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .gc-form-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 10px 14px; margin-bottom: 14px; transition: border-color 0.2s; box-sizing: border-box; }
+        .gc-form-input:focus { border-color: var(--brand); outline: none; }
+        .gc-emoji-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .gc-emoji-opt { font-size: 22px; cursor: pointer; padding: 6px; border-radius: 8px; border: 2px solid transparent; transition: all 0.15s; }
+        .gc-emoji-opt:hover, .gc-emoji-opt.selected { border-color: var(--brand); background: var(--brand-dim); }
+        .gc-new-btn { padding: 10px 16px; margin: 10px; background: var(--brand-dim); border: 1px dashed var(--border2); border-radius: 8px; color: var(--brand); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .gc-new-btn:hover { background: var(--brand); color: white; }
+
+        /* ── SEARCH ── */
+        #search-view { display: none; }
+        .search-bar-wrap { position: relative; margin-bottom: 24px; }
+        .search-bar-input { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 99px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; padding: 14px 20px 14px 48px; transition: border-color 0.2s; box-sizing: border-box; }
+        .search-bar-input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 3px var(--brand-glow); }
+        .search-bar-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+        .search-results-section { margin-bottom: 28px; }
+        .search-section-title { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .search-game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .search-game-chip { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .search-game-chip:hover { border-color: var(--border2); background: var(--surface2); }
+        .search-game-emoji { font-size: 20px; flex-shrink: 0; }
+        .search-game-name { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; }
+        .search-player-list { display: flex; flex-direction: column; gap: 8px; }
+        .search-player-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
+        .search-player-item:hover { border-color: var(--border2); }
+        .search-player-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-dim); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; color: var(--brand); flex-shrink: 0; }
+        .search-player-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; flex: 1; }
+        .search-player-xp { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--success); }
+        .search-empty { text-align: center; padding: 48px; color: var(--text-muted); font-size: 14px; }
+
+        /* ── SHOP ── */
+        #shop-view { display: none; }
+        .shop-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .shop-balance { background: var(--surface); border: 1px solid rgba(245,158,11,0.3); border-radius: 99px; padding: 8px 18px; font-family: 'Share Tech Mono', monospace; font-size: 14px; color: #f59e0b; display: flex; align-items: center; gap: 8px; }
+        .shop-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .shop-tab { padding: 8px 20px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+        .shop-tab.active { background: var(--brand-dim); border-color: var(--border2); color: white; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .shop-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; text-align: center; transition: all 0.2s; position: relative; overflow: hidden; }
+        .shop-item:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .shop-item.owned { border-color: rgba(16,185,129,0.3); }
+        .shop-item-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .shop-item-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+        .shop-item-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4; }
+        .shop-item-price { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: #f59e0b; font-weight: 700; margin-bottom: 12px; }
+        .btn-buy { padding: 8px 20px; background: var(--brand); color: white; border: none; border-radius: 99px; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
+        .btn-buy:hover:not(:disabled) { background: #4f52e0; }
+        .btn-buy:disabled { background: var(--surface2); color: var(--text-muted); cursor: not-allowed; }
+        .btn-buy.owned-btn { background: var(--success); cursor: default; }
+
+        /* ── TOURNAMENTS ── */
+        #tournament-view { display: none; }
+        .tournament-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 16px; display: flex; align-items: center; gap: 20px; transition: all 0.2s; position: relative; overflow: hidden; }
+        .tournament-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--brand), var(--success)); }
+        .tournament-card:hover { border-color: var(--border2); }
+        .tournament-icon { font-size: 36px; flex-shrink: 0; }
+        .tournament-info { flex: 1; }
+        .tournament-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+        .tournament-meta { font-size: 12px; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; margin-bottom: 8px; }
+        .tournament-prizes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .prize-badge { padding: 4px 10px; border-radius: 99px; font-size: 10px; font-family: 'Share Tech Mono', monospace; font-weight: 700; }
+        .prize-1st { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
+        .prize-2nd { background: rgba(156,163,175,0.15); border: 1px solid rgba(156,163,175,0.3); color: #9ca3af; }
+        .prize-3rd { background: rgba(180,113,60,0.15); border: 1px solid rgba(180,113,60,0.3); color: #b4713c; }
+        .tournament-right { text-align: right; flex-shrink: 0; }
+        .tournament-players { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+        .btn-join-tourney { padding: 10px 20px; background: linear-gradient(135deg, var(--brand), #8b5cf6); color: white; border: none; border-radius: 99px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-join-tourney:hover { box-shadow: 0 0 20px var(--brand-glow); transform: translateY(-1px); }
+        .btn-join-tourney.joined { background: var(--success); }
+        .tournament-status { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 10px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; margin-bottom: 8px; }
+        .status-open { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+        .status-live { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); animation: blink 1.5s infinite; }
+        .status-soon { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .tl-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; margin-bottom: 16px; }
+        .tl-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .tl-row:last-child { border-bottom: none; }
+        .tl-rank { font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: 700; width: 28px; flex-shrink: 0; }
+        .tl-rank.gold { color: #f59e0b; } .tl-rank.silver { color: #9ca3af; } .tl-rank.bronze { color: #b4713c; }
+        .tl-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; flex: 1; }
+        .tl-score { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--success); }
+
+        /* ── COIN COUNTER ── */
+        .coin-pill { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); border-radius: 99px; padding: 5px 12px; font-family: 'Share Tech Mono', monospace; font-size: 13px; color: #f59e0b; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
+        .coin-pill:hover { border-color: rgba(245,158,11,0.5); }
+
+        /* ── GAME OF THE WEEK ── */
+        .gotw-banner { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.08)); border: 1px solid rgba(139,92,246,0.3); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
+        .gotw-banner:hover { border-color: rgba(139,92,246,0.5); }
+        .gotw-banner::before { content: ''; position: absolute; top:-30px; right:-30px; width:100px; height:100px; background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%); pointer-events:none; }
+        .gotw-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; color: #a78bfa; text-transform: uppercase; margin-bottom: 4px; }
+        .gotw-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; }
+        .gotw-xp { font-family: 'Share Tech Mono', monospace; font-size: 20px; color: #a78bfa; font-weight: 700; text-align: center; flex-shrink: 0; }
+        .gotw-xp span { display: block; font-size: 9px; letter-spacing: 1px; color: var(--text-muted); }
     </style>
 </head>
 <body onload="initPortal()">
@@ -2177,6 +2314,23 @@
         <div class="nav-item" id="tab-dm" onclick="switchTab('dm')">
             <span class="nav-icon">💬</span> Messages
             <span class="nav-badge" id="dm-nav-badge" style="display:none;"></span>
+        </div>
+
+        <div class="nav-item" id="tab-gc" onclick="switchTab('gc')">
+            <span class="nav-icon">👥</span> Group Chats
+            <span class="nav-badge" id="gc-nav-badge" style="display:none;"></span>
+        </div>
+
+        <div class="nav-item" id="tab-search" onclick="switchTab('search')">
+            <span class="nav-icon">🔍</span> Search
+        </div>
+
+        <div class="nav-item" id="tab-tournament" onclick="switchTab('tournament')">
+            <span class="nav-icon">🏆</span> Tournaments
+        </div>
+
+        <div class="nav-item" id="tab-shop" onclick="switchTab('shop')">
+            <span class="nav-icon">🛒</span> Shop
         </div>
 
         <div class="sidebar-section">Core Games</div>
@@ -2374,6 +2528,7 @@
                 </div>
                 <div class="pill"><div class="dot"></div> System Online</div>
                 <div class="pill">XP <span class="xp-val" id="xp-pill">0</span></div>
+                <div class="coin-pill" onclick="switchTab('shop')" title="Coins — spend in the Shop">🪙 <span id="coin-display">0</span></div>
                 <div class="notif-bell" onclick="toggleNotifDropdown()" id="notif-bell">
                     🔔
                     <div class="notif-badge" id="notif-badge"></div>
@@ -2394,6 +2549,16 @@
         <div class="content-area">
             <!-- ARCADE TAB -->
             <div id="arcade-view">
+                <!-- Game of the Week Banner -->
+                <div class="gotw-banner" id="gotw-banner" onclick="loadGameFromLib(GOTW_KEY)">
+                    <div style="font-size:36px;flex-shrink:0;" id="gotw-icon">🎮</div>
+                    <div style="flex:1;">
+                        <div class="gotw-label">🌟 Game of the Week</div>
+                        <div class="gotw-title" id="gotw-name">Loading...</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Featured pick — extra XP all week!</div>
+                    </div>
+                    <div class="gotw-xp"><span id="gotw-xp">+2x</span><span>XP BOOST</span></div>
+                </div>
                 <!-- Daily Challenge Banner -->
                 <div class="daily-challenge-banner" id="daily-challenge-banner">
                     <div class="daily-challenge-icon" id="dc-icon">⚡</div>
@@ -3273,6 +3438,99 @@
                     <div class="new-dm-user-list" id="new-dm-user-list">
                         <div class="notif-empty">Loading players...</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- GROUP CHATS VIEW -->
+            <div id="gc-view">
+                <div class="lb-header"><h2>👥 Group Chats</h2></div>
+                <div class="gc-layout">
+                    <div class="gc-sidebar">
+                        <div class="gc-sidebar-header">
+                            Rooms
+                            <span class="gc-create-btn" onclick="openCreateGcModal()" title="Create Group">＋</span>
+                        </div>
+                        <div class="gc-list" id="gc-list">
+                            <div class="notif-empty" style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No group chats yet</div>
+                        </div>
+                        <div class="gc-new-btn" onclick="openCreateGcModal()">+ Create Group</div>
+                    </div>
+                    <div class="gc-chat-pane" id="gc-chat-pane">
+                        <div class="gc-empty-state">
+                            <div style="font-size:48px;opacity:0.3;">👥</div>
+                            <div>Select a group or create one</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEARCH VIEW -->
+            <div id="search-view">
+                <div class="lb-header"><h2>🔍 Search</h2></div>
+                <div class="search-bar-wrap">
+                    <span class="search-bar-icon">🔍</span>
+                    <input class="search-bar-input" id="main-search-input" placeholder="Search games, players..." oninput="doSearch(this.value)" autofocus>
+                </div>
+                <div id="search-results">
+                    <div class="search-results-section">
+                        <div class="search-section-title">🎮 All Games</div>
+                        <div class="search-game-grid" id="search-games-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOP VIEW -->
+            <div id="shop-view">
+                <div class="shop-header">
+                    <div class="lb-header" style="margin:0;"><h2>🛒 Shop</h2></div>
+                    <div class="shop-balance">🪙 <span id="shop-coin-display">0</span> Coins</div>
+                </div>
+                <div class="shop-tabs">
+                    <button class="shop-tab active" id="stab-boosts" onclick="switchShopTab('boosts')">⚡ XP Boosts</button>
+                    <button class="shop-tab" id="stab-badges" onclick="switchShopTab('badges')">🏅 Badges</button>
+                    <button class="shop-tab" id="stab-themes" onclick="switchShopTab('themes')">🎨 Themes</button>
+                    <button class="shop-tab" id="stab-flair" onclick="switchShopTab('flair')">✨ Flair</button>
+                </div>
+                <div class="shop-grid" id="shop-grid"></div>
+            </div>
+
+            <!-- TOURNAMENT VIEW -->
+            <div id="tournament-view">
+                <div class="lb-header"><h2>🏆 Tournaments</h2></div>
+                <div id="tournament-list"></div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-top:8px;">
+                    <div class="tl-title">🥇 Current Tournament Leaders</div>
+                    <div id="tournament-lb"></div>
+                </div>
+            </div>
+
+            <!-- Create GC Modal -->
+            <div class="modal-overlay" id="create-gc-modal">
+                <div class="create-gc-modal">
+                    <button class="profile-modal-close" onclick="closeCreateGcModal()">✕</button>
+                    <div class="create-gc-title">Create Group Chat</div>
+                    <label class="gc-form-label">Group Name</label>
+                    <input class="gc-form-input" id="gc-name-input" placeholder="e.g. Snake Legends, Friday Night Gamers..." maxlength="40">
+                    <label class="gc-form-label">Pick an Emoji Icon</label>
+                    <div class="gc-emoji-row" id="gc-emoji-row">
+                        <span class="gc-emoji-opt selected" onclick="selectGcEmoji(this,'🎮')">🎮</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🏆')">🏆</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🔥')">🔥</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'⚡')">⚡</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'💎')">💎</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🌟')">🌟</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🐍')">🐍</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'👾')">👾</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🚀')">🚀</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🎯')">🎯</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🦊')">🦊</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🐉')">🐉</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'💀')">💀</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🎲')">🎲</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🕹️')">🕹️</span>
+                        <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🏅')">🏅</span>
+                    </div>
+                    <button class="btn-challenge" style="width:100%;border-radius:10px;padding:12px;" onclick="createGroupChat()">Create Group</button>
                 </div>
             </div>
 
@@ -4850,6 +5108,471 @@
             setNowPlaying(null);
             _origStopSession();
         };
+
+        // ══════════════════════════════════════════════════════════════════
+        // COINS SYSTEM
+        // ══════════════════════════════════════════════════════════════════
+        function getCoins() { try { return parseInt(localStorage.getItem('lvl_coins') || '0'); } catch(e) { return 0; } }
+        function setCoins(n) { try { localStorage.setItem('lvl_coins', n); } catch(e) {} updateCoinDisplay(); }
+        function addCoins(n) { setCoins(getCoins() + n); }
+        function spendCoins(n) { const c = getCoins(); if (c < n) return false; setCoins(c - n); return true; }
+        function updateCoinDisplay() {
+            const c = getCoins();
+            const el1 = document.getElementById('coin-display');
+            const el2 = document.getElementById('shop-coin-display');
+            if (el1) el1.innerText = c.toLocaleString();
+            if (el2) el2.innerText = c.toLocaleString();
+        }
+
+        // Award coins when XP is earned (1 coin per 10 XP)
+        const _origUpdateXP = updateXPDisplay;
+        let _lastXPForCoins = 0;
+        updateXPDisplay = function() {
+            _origUpdateXP();
+            const gained = totalXP - _lastXPForCoins;
+            if (gained > 0) { addCoins(Math.floor(gained / 10)); _lastXPForCoins = totalXP; }
+            updateCoinDisplay();
+        };
+
+        // ══════════════════════════════════════════════════════════════════
+        // GAME OF THE WEEK
+        // ══════════════════════════════════════════════════════════════════
+        const GOTW_ROTATION = ['snake','tetris','pacman','flappyBird','dodger','asteroidDodge','warzone','geometryRush','slope','battleRoyale'];
+        const GOTW_KEY = GOTW_ROTATION[Math.floor(Date.now() / (7*86400000)) % GOTW_ROTATION.length];
+
+        function initGOTW() {
+            const game = GamesLib[GOTW_KEY];
+            if (!game) return;
+            document.getElementById('gotw-icon').innerText = game.emoji || '🎮';
+            document.getElementById('gotw-name').innerText = game.title;
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // SEARCH
+        // ══════════════════════════════════════════════════════════════════
+        function initSearchView() {
+            const grid = document.getElementById('search-games-grid');
+            if (!grid || !window.GamesLib) return;
+            grid.innerHTML = Object.entries(GamesLib).map(([key, g]) =>
+                `<div class="search-game-chip" onclick="loadGameFromLib('${key}');switchTab('arcade')">
+                    <span class="search-game-emoji">${g.emoji || '🎮'}</span>
+                    <span class="search-game-name">${g.title}</span>
+                </div>`
+            ).join('');
+        }
+
+        async function doSearch(query) {
+            const q = query.trim().toLowerCase();
+            const resultsEl = document.getElementById('search-results');
+            if (!q) {
+                initSearchView();
+                return;
+            }
+            // Search games
+            const gameMatches = Object.entries(GamesLib || {}).filter(([k, g]) =>
+                g.title.toLowerCase().includes(q)
+            );
+            // Search players
+            const { data: players } = await sb.from('profiles').select('id,username,xp').ilike('username', `%${q}%`).limit(10);
+
+            resultsEl.innerHTML = `
+                <div class="search-results-section">
+                    <div class="search-section-title">🎮 Games (${gameMatches.length})</div>
+                    ${gameMatches.length ? `<div class="search-game-grid">${gameMatches.map(([k,g]) =>
+                        `<div class="search-game-chip" onclick="loadGameFromLib('${k}');switchTab('arcade')">
+                            <span class="search-game-emoji">${g.emoji||'🎮'}</span>
+                            <span class="search-game-name">${g.title}</span>
+                        </div>`).join('')}</div>`
+                    : `<div class="search-empty">No games found</div>`}
+                </div>
+                <div class="search-results-section">
+                    <div class="search-section-title">👤 Players (${players ? players.length : 0})</div>
+                    ${players && players.length ? `<div class="search-player-list">${players.map(p =>
+                        `<div class="search-player-item" onclick="startNewDm('${p.id}','${escHtml(p.username)}');switchTab('dm')">
+                            <div class="search-player-avatar">${(p.username||'?')[0].toUpperCase()}</div>
+                            <div class="search-player-name">${escHtml(p.username)}</div>
+                            <div class="search-player-xp">${(p.xp||0).toLocaleString()} XP</div>
+                        </div>`).join('')}</div>`
+                    : `<div class="search-empty">No players found</div>`}
+                </div>`;
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // SHOP
+        // ══════════════════════════════════════════════════════════════════
+        const SHOP_ITEMS = {
+            boosts: [
+                { id:'boost_2x_1h',  icon:'⚡', name:'2x XP Boost (1hr)',   desc:'Double XP for 1 hour of play time.',     price:200,  effect:'xp2x_1h' },
+                { id:'boost_3x_30m', icon:'🔥', name:'3x XP Boost (30min)', desc:'Triple XP for 30 minutes.',             price:350,  effect:'xp3x_30m' },
+                { id:'boost_5x_15m', icon:'💥', name:'5x XP Blitz (15min)', desc:'Five times XP for 15 minutes.',         price:500,  effect:'xp5x_15m' },
+                { id:'boost_daily',  icon:'🌅', name:'Daily XP Bonus',       desc:'+25 XP every day you log in.',          price:150,  effect:'daily_bonus' },
+            ],
+            badges: [
+                { id:'badge_flame',  icon:'🔥', name:'Flame Badge',          desc:'Show off a flame next to your name.',   price:100 },
+                { id:'badge_crown',  icon:'👑', name:'Crown Badge',          desc:'Royalty status for your profile.',      price:500 },
+                { id:'badge_gem',    icon:'💎', name:'Gem Badge',            desc:'A shimmering gem badge.',               price:300 },
+                { id:'badge_star',   icon:'⭐', name:'Gold Star Badge',      desc:'A shining gold star by your name.',     price:200 },
+                { id:'badge_skull',  icon:'💀', name:'Skull Badge',          desc:'For the hardcore gamers.',              price:250 },
+                { id:'badge_rocket', icon:'🚀', name:'Rocket Badge',         desc:'Shoot for the stars.',                  price:175 },
+            ],
+            themes: [
+                { id:'theme_purple', icon:'🟣', name:'Purple Void',          desc:'Deep purple accent color.',             price:400 },
+                { id:'theme_green',  icon:'🟢', name:'Matrix Green',         desc:'Hacker green terminal vibes.',          price:400 },
+                { id:'theme_red',    icon:'🔴', name:'Blood Red',            desc:'Intense red accent.',                   price:400 },
+                { id:'theme_gold',   icon:'🟡', name:'Gold Rush',            desc:'Golden accent color.',                  price:600 },
+                { id:'theme_cyan',   icon:'🩵', name:'Neon Cyan',            desc:'Electric cyan glow.',                   price:400 },
+            ],
+            flair: [
+                { id:'flair_trail',  icon:'✨', name:'XP Trail',             desc:'Sparkle trail on your avatar.',         price:250 },
+                { id:'flair_border', icon:'🌈', name:'Rainbow Border',        desc:'Animated rainbow avatar border.',       price:350 },
+                { id:'flair_aura',   icon:'🌟', name:'Golden Aura',           desc:'Glow effect around your profile.',     price:450 },
+                { id:'flair_title',  icon:'🏷️', name:'Custom Title',         desc:'Set a custom title under your name.',   price:300 },
+            ],
+        };
+
+        let _shopTab = 'boosts';
+
+        function getOwned() { try { return new Set(JSON.parse(localStorage.getItem('lvl_owned') || '[]')); } catch(e) { return new Set(); } }
+        function addOwned(id) { const o = getOwned(); o.add(id); try { localStorage.setItem('lvl_owned', JSON.stringify([...o])); } catch(e) {} }
+
+        function switchShopTab(tab) {
+            _shopTab = tab;
+            ['boosts','badges','themes','flair'].forEach(t => {
+                document.getElementById('stab-' + t).classList.toggle('active', t === tab);
+            });
+            renderShopGrid();
+        }
+
+        function renderShopGrid() {
+            const items = SHOP_ITEMS[_shopTab] || [];
+            const owned = getOwned();
+            const coins = getCoins();
+            document.getElementById('shop-grid').innerHTML = items.map(item => {
+                const isOwned = owned.has(item.id);
+                return `<div class="shop-item ${isOwned ? 'owned' : ''}">
+                    <span class="shop-item-icon">${item.icon}</span>
+                    <div class="shop-item-name">${item.name}</div>
+                    <div class="shop-item-desc">${item.desc}</div>
+                    <div class="shop-item-price">🪙 ${item.price.toLocaleString()}</div>
+                    ${isOwned
+                        ? `<button class="btn-buy owned-btn" disabled>✓ Owned</button>`
+                        : `<button class="btn-buy" onclick="buyItem('${item.id}')" ${coins < item.price ? 'disabled' : ''}>
+                            ${coins < item.price ? '🔒 Need more coins' : 'Buy Now'}
+                           </button>`
+                    }
+                </div>`;
+            }).join('');
+        }
+
+        function buyItem(itemId) {
+            const allItems = Object.values(SHOP_ITEMS).flat();
+            const item = allItems.find(i => i.id === itemId);
+            if (!item) return;
+            if (!spendCoins(item.price)) { showToast('Not enough coins! Keep playing to earn more 🪙'); return; }
+            addOwned(itemId);
+            applyShopItem(item);
+            showToast(`🎉 Purchased ${item.name}!`);
+            addLocalNotif({ icon: item.icon, text: `<strong>Shop Purchase!</strong> You bought ${item.name}`, ts: Date.now() });
+            renderShopGrid();
+            updateCoinDisplay();
+        }
+
+        function applyShopItem(item) {
+            if (!item.effect) return;
+            if (item.effect === 'xp2x_1h') { activateXPBoost(2, 3600000); }
+            else if (item.effect === 'xp3x_30m') { activateXPBoost(3, 1800000); }
+            else if (item.effect === 'xp5x_15m') { activateXPBoost(5, 900000); }
+        }
+
+        // Apply owned themes on load
+        function applyOwnedItems() {
+            const owned = getOwned();
+            const themes = { theme_green: '#10b981', theme_red: '#ef4444', theme_gold: '#f59e0b', theme_cyan: '#06b6d4', theme_purple: '#a855f7' };
+            for (const [id, color] of Object.entries(themes)) {
+                if (owned.has(id)) { document.documentElement.style.setProperty('--brand', color); break; }
+            }
+        }
+
+        // XP Boost system
+        let _xpBoostMultiplier = 1;
+        let _xpBoostTimeout = null;
+        function activateXPBoost(mult, durationMs) {
+            _xpBoostMultiplier = mult;
+            if (_xpBoostTimeout) clearTimeout(_xpBoostTimeout);
+            showToast(`⚡ ${mult}x XP Boost activated for ${Math.round(durationMs/60000)} minutes!`);
+            _xpBoostTimeout = setTimeout(() => { _xpBoostMultiplier = 1; showToast('XP Boost expired'); }, durationMs);
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // TOURNAMENTS
+        // ══════════════════════════════════════════════════════════════════
+        const TOURNAMENTS = [
+            { id:'t1', name:'Snake Speed Run', icon:'🐍', game:'snake', status:'live', players:24, max:32, prizes:['5000 XP','2500 XP','1000 XP'], desc:'Highest score in 3 minutes wins!' },
+            { id:'t2', name:'Flappy Bird Marathon', icon:'🐦', game:'flappyBird', status:'open', players:11, max:20, prizes:['3000 XP','1500 XP','750 XP'], desc:'Most pipes passed in 5 attempts.' },
+            { id:'t3', name:'Tetris Master Class', icon:'🟦', game:'tetris', status:'soon', players:0, max:16, prizes:['4000 XP','2000 XP','800 XP'], desc:'Highest lines cleared in 5 minutes.' },
+            { id:'t4', name:'Dodger Gauntlet', icon:'💨', game:'dodger', status:'open', players:7, max:30, prizes:['2500 XP','1200 XP','600 XP'], desc:'Longest survival time wins.' },
+            { id:'t5', name:'Pacman Blitz', icon:'🟡', game:'pacman', status:'open', players:5, max:20, prizes:['3500 XP','1750 XP','875 XP'], desc:'Most pellets eaten in 3 minutes.' },
+        ];
+
+        function renderTournaments() {
+            const joined = new Set(JSON.parse(localStorage.getItem('lvl_tournaments') || '[]'));
+            document.getElementById('tournament-list').innerHTML = TOURNAMENTS.map(t => `
+                <div class="tournament-card">
+                    <div class="tournament-icon">${t.icon}</div>
+                    <div class="tournament-info">
+                        <span class="tournament-status status-${t.status}">${t.status.toUpperCase()}</span>
+                        <div class="tournament-name">${t.name}</div>
+                        <div class="tournament-meta">${t.desc}</div>
+                        <div class="tournament-prizes">
+                            <span class="prize-badge prize-1st">🥇 ${t.prizes[0]}</span>
+                            <span class="prize-badge prize-2nd">🥈 ${t.prizes[1]}</span>
+                            <span class="prize-badge prize-3rd">🥉 ${t.prizes[2]}</span>
+                        </div>
+                    </div>
+                    <div class="tournament-right">
+                        <div class="tournament-players">${t.players}/${t.max} players</div>
+                        <button class="btn-join-tourney ${joined.has(t.id)?'joined':''}" onclick="joinTournament('${t.id}','${t.game}')">
+                            ${joined.has(t.id) ? '✓ Joined — Play' : (t.status==='soon' ? '🔔 Notify Me' : 'Join & Play')}
+                        </button>
+                    </div>
+                </div>`).join('');
+
+            // Render fake leaderboard
+            const mockLb = [
+                {name:'XxSniperKingxX',score:18420},{name:'NeonRacer99',score:15300},{name:'ByteWitch',score:12800},
+                {name:'PixelDestroyer',score:11200},{name:'GhostFrame',score:9750},{name:'CryptoAce',score:8100},
+            ];
+            const myName = window._currentUsername || 'You';
+            document.getElementById('tournament-lb').innerHTML = mockLb.map((p,i) => `
+                <div class="tl-row">
+                    <div class="tl-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
+                    <div class="tl-name">${escHtml(p.name)}</div>
+                    <div class="tl-score">${p.score.toLocaleString()} pts</div>
+                </div>`).join('') + (currentUser ? `<div class="tl-row" style="border-top:1px solid var(--border2);margin-top:8px;padding-top:12px;">
+                    <div class="tl-rank" style="color:var(--brand)">YOU</div>
+                    <div class="tl-name" style="color:var(--brand)">${escHtml(myName)}</div>
+                    <div class="tl-score">${totalXP.toLocaleString()} pts</div>
+                </div>` : '');
+        }
+
+        function joinTournament(id, gameKey) {
+            if (isGhost) { showToast('Log in to join tournaments!'); return; }
+            const joined = new Set(JSON.parse(localStorage.getItem('lvl_tournaments') || '[]'));
+            if (!joined.has(id)) {
+                joined.add(id);
+                localStorage.setItem('lvl_tournaments', JSON.stringify([...joined]));
+                showToast('🏆 Joined tournament! Good luck!');
+                addLocalNotif({ icon:'🏆', text:'<strong>Tournament joined!</strong> Play now to climb the leaderboard.', ts:Date.now() });
+                // Award XP for participating
+                totalXP += 25;
+                updateXPDisplay();
+            }
+            renderTournaments();
+            loadGameFromLib(gameKey);
+            switchTab('arcade');
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // GROUP CHATS
+        // ══════════════════════════════════════════════════════════════════
+        let _gcCurrentId = null;
+        let _gcPollInterval = null;
+        let _selectedGcEmoji = '🎮';
+
+        function selectGcEmoji(el, emoji) {
+            document.querySelectorAll('.gc-emoji-opt').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            _selectedGcEmoji = emoji;
+        }
+
+        function openCreateGcModal() {
+            if (isGhost) { showToast('Log in to create group chats!'); return; }
+            document.getElementById('create-gc-modal').classList.add('open');
+        }
+        function closeCreateGcModal() { document.getElementById('create-gc-modal').classList.remove('open'); }
+
+        async function createGroupChat() {
+            const name = document.getElementById('gc-name-input').value.trim();
+            if (!name) { showToast('Give your group a name!'); return; }
+            if (!currentUser) return;
+            const myName = window._currentUsername || currentUser.email.split('@')[0];
+            const { data, error } = await sb.from('group_chats').insert({
+                name, emoji: _selectedGcEmoji,
+                created_by: currentUser.id,
+                members: [currentUser.id]
+            }).select().single();
+            if (error) { showToast('Error creating group: ' + error.message); return; }
+            closeCreateGcModal();
+            document.getElementById('gc-name-input').value = '';
+            showToast(`👥 "${name}" created!`);
+            await loadGcList();
+            if (data) openGcChat(data.id, data.name, data.emoji);
+        }
+
+        async function loadGcList() {
+            if (!currentUser) return;
+            const { data, error } = await sb.from('group_chats')
+                .select('id,name,emoji,created_at')
+                .order('created_at', { ascending: false })
+                .limit(30);
+            const el = document.getElementById('gc-list');
+            if (error || !data || !data.length) {
+                el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No group chats yet.<br>Create one below!</div>';
+                return;
+            }
+            el.innerHTML = data.map(gc => `
+                <div class="gc-item ${_gcCurrentId===gc.id?'active':''}" onclick="openGcChat('${gc.id}','${escHtml(gc.name)}','${gc.emoji||'🎮'}')">
+                    <div class="gc-avatar">${gc.emoji||'🎮'}</div>
+                    <div class="gc-info">
+                        <div class="gc-name">${escHtml(gc.name)}</div>
+                        <div class="gc-preview">Tap to open</div>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function openGcChat(gcId, gcName, gcEmoji) {
+            _gcCurrentId = gcId;
+            const pane = document.getElementById('gc-chat-pane');
+            pane.innerHTML = `
+                <div class="gc-chat-header">
+                    <div class="gc-chat-avatar">${gcEmoji||'🎮'}</div>
+                    <div class="gc-chat-name">${escHtml(gcName)}</div>
+                    <div class="gc-member-count" id="gc-member-count">Group Chat</div>
+                </div>
+                <div class="gc-messages" id="gc-messages-${gcId}"><div class="feed-loading">LOADING...</div></div>
+                <div class="gc-composer">
+                    <input class="gc-input" id="gc-input-${gcId}" placeholder="Message the group..." maxlength="500"
+                        onkeydown="if(event.key==='Enter')sendGcMessage('${gcId}')">
+                    <button class="gc-send-btn" onclick="sendGcMessage('${gcId}')">Send</button>
+                </div>`;
+            await loadGcMessages(gcId);
+            if (_gcPollInterval) clearInterval(_gcPollInterval);
+            _gcPollInterval = setInterval(() => loadGcMessages(gcId), 5000);
+            // Update sidebar active state
+            document.querySelectorAll('.gc-item').forEach(el => {
+                el.classList.toggle('active', el.getAttribute('onclick') && el.getAttribute('onclick').includes(gcId));
+            });
+        }
+
+        async function loadGcMessages(gcId) {
+            const { data } = await sb.from('group_messages')
+                .select('*').eq('group_id', gcId)
+                .order('created_at', { ascending: true }).limit(100);
+            const el = document.getElementById(`gc-messages-${gcId}`);
+            if (!el) return;
+            const myId = currentUser?.id || 'ghost';
+            if (!data || !data.length) {
+                el.innerHTML = '<div style="margin:auto;text-align:center;color:var(--text-muted);font-size:13px;">No messages yet — say something! 👋</div>';
+                return;
+            }
+            el.innerHTML = data.map(msg => {
+                const mine = msg.sender_id === myId;
+                return `<div class="gc-msg ${mine?'mine':'theirs'}">
+                    ${!mine ? `<div class="gc-msg-avatar">${(msg.sender_name||'?')[0].toUpperCase()}</div>` : ''}
+                    <div class="gc-msg-body">
+                        <div class="gc-msg-name">${mine ? 'You' : escHtml(msg.sender_name||'?')} · ${timeAgo(msg.created_at)}</div>
+                        <div class="gc-msg-bubble">${escHtml(msg.content)}</div>
+                    </div>
+                    ${mine ? `<div class="gc-msg-avatar" style="background:var(--brand);color:white;border-color:transparent;">${(window._currentUsername||'Y')[0].toUpperCase()}</div>` : ''}
+                </div>`;
+            }).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function sendGcMessage(gcId) {
+            const input = document.getElementById(`gc-input-${gcId}`);
+            if (!input || !currentUser) return;
+            const content = input.value.trim();
+            if (!content) return;
+            const myName = window._currentUsername || currentUser.email.split('@')[0];
+            const { error } = await sb.from('group_messages').insert({
+                group_id: gcId, sender_id: currentUser.id,
+                sender_name: myName, content
+            });
+            if (error) { showToast('Failed to send'); return; }
+            input.value = '';
+            await loadGcMessages(gcId);
+        }
+
+        async function loadGcView() {
+            if (isGhost) {
+                document.getElementById('gc-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">Log in to join group chats</div>';
+                return;
+            }
+            await loadGcList();
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // EXTENDED TAB SWITCHING
+        // ══════════════════════════════════════════════════════════════════
+        const _origSwitchTab2 = switchTab;
+        const ALL_VIEWS = ['arcade-view','media-view','leaderboard-view','feed-view','gaming-view','dm-view','gc-view','search-view','shop-view','tournament-view'];
+        const ALL_TABS = ['tab-arcade','tab-leaderboard','tab-feed','tab-gaming','tab-dm','tab-gc','tab-search','tab-shop','tab-tournament'];
+
+        switchTab = function(type) {
+            // Hide all new views
+            ['gc-view','search-view','shop-view','tournament-view'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            ['tab-gc','tab-search','tab-shop','tab-tournament'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+
+            if (type === 'gc') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                ALL_VIEWS.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+                document.getElementById('gc-view').style.display = 'block';
+                document.getElementById('tab-gc').classList.add('active');
+                document.getElementById('active-title').innerText = 'GROUP CHATS';
+                loadGcView();
+                return;
+            }
+            if (type === 'search') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                ALL_VIEWS.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+                document.getElementById('search-view').style.display = 'block';
+                document.getElementById('tab-search').classList.add('active');
+                document.getElementById('active-title').innerText = 'SEARCH';
+                setTimeout(initSearchView, 100);
+                setTimeout(() => document.getElementById('main-search-input')?.focus(), 150);
+                return;
+            }
+            if (type === 'shop') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                ALL_VIEWS.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+                document.getElementById('shop-view').style.display = 'block';
+                document.getElementById('tab-shop').classList.add('active');
+                document.getElementById('active-title').innerText = 'SHOP';
+                updateCoinDisplay();
+                renderShopGrid();
+                return;
+            }
+            if (type === 'tournament') {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                ALL_VIEWS.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+                document.getElementById('tournament-view').style.display = 'block';
+                document.getElementById('tab-tournament').classList.add('active');
+                document.getElementById('active-title').innerText = 'TOURNAMENTS';
+                renderTournaments();
+                return;
+            }
+            _origSwitchTab2(type);
+        };
+
+        // ══════════════════════════════════════════════════════════════════
+        // EXTENDED initPortal
+        // ══════════════════════════════════════════════════════════════════
+        const _origInitPortal2 = initPortal;
+        initPortal = async function() {
+            await _origInitPortal2();
+            updateCoinDisplay();
+            _lastXPForCoins = totalXP;
+            applyOwnedItems();
+            setTimeout(initGOTW, 200);
+        };
+        document.body.onload = initPortal;
 
     </script>
 </body>
