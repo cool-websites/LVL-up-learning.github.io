@@ -2585,6 +2585,6 @@ motocrossx3m: {
         xpMultiplier: 15,
         emoji: "👁️",
         color: "linear-gradient(135deg, #0a0000, #1a0000)",
-        url: "https://qz-games.github.io/Games04/fnae/"
+        url: "https://cool-websites.github.io/Five-Nights-at-Epstein/"
     },
 };
