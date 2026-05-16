@@ -2150,6 +2150,32 @@
         .gc-emoji-opt:hover, .gc-emoji-opt.selected { border-color: var(--brand); background: var(--brand-dim); }
         .gc-new-btn { padding: 10px 16px; margin: 10px; background: var(--brand-dim); border: 1px dashed var(--border2); border-radius: 8px; color: var(--brand); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
         .gc-new-btn:hover { background: var(--brand); color: white; }
+        .gc-visibility-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+        .gc-vis-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .gc-vis-btn.selected { border-color: var(--brand); background: var(--brand-dim); color: var(--brand); }
+        .gc-public-badge { font-size: 10px; padding: 2px 7px; border-radius: 99px; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px; flex-shrink: 0; }
+        .gc-public-badge.public { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+        .gc-public-badge.private { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); color: var(--brand); }
+        .gc-tabs { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .gc-tab-btn { flex: 1; padding: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .gc-tab-btn.active { background: var(--brand-dim); border-color: var(--border2); color: var(--brand); }
+        .gc-join-btn { padding: 5px 14px; background: var(--success); color: white; border: none; border-radius: 99px; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .gc-join-btn:hover { box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+        .gc-join-btn.joined { background: var(--surface2); color: var(--text-muted); cursor: default; }
+        .gc-members-panel { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+        .gc-members-title { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .gc-invite-btn { font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--border2); background: var(--brand-dim); color: var(--brand); font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .gc-invite-btn:hover { background: var(--brand); color: white; }
+        .gc-member-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .gc-member-chip { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700; }
+        .gc-member-chip-avatar { width: 18px; height: 18px; border-radius: 50%; background: var(--brand-dim); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--brand); font-weight: 800; }
+        .invite-gc-modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-xl); width: 420px; max-width: 95vw; padding: 28px; position: relative; }
+        .invite-gc-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+        .invite-user-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .invite-user-item { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; transition: all 0.15s; }
+        .invite-user-item.already { opacity: 0.5; }
+        .btn-invite-user { padding: 5px 12px; background: var(--brand); color: white; border: none; border-radius: 99px; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-invite-user:disabled { background: var(--surface2); color: var(--text-muted); cursor: default; }
 
         /* ── SEARCH ── */
         #search-view { display: none; }
@@ -2490,6 +2516,30 @@
         <div class="nav-item-game danger" onclick="loadGameFromLib('fnaeEpsteins')">
             <div class="game-dot"></div> Five Nights At Epstiens
         </div>
+        <div class="nav-item-game" style="color:var(--text-muted);font-size:10px;letter-spacing:2px;padding:10px 16px 4px;font-family:'Share Tech Mono',monospace;">GOOGLE DOODLES</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_pacman')"><div class="game-dot"></div> PAC-MAN Doodle</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_champion_island')"><div class="game-dot"></div> Champion Island</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_cricket')"><div class="game-dot"></div> Cricket</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_halloween2022')"><div class="game-dot"></div> Great Ghoul Duel</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_halloween2018')"><div class="game-dot"></div> Halloween 2018</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_halloween2016')"><div class="game-dot"></div> Halloween 2016</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_garden')"><div class="game-dot"></div> Garden Gnomes</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_rubik')"><div class="game-dot"></div> Rubik's Cube</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_coding')"><div class="game-dot"></div> Coding for Carrots</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_quick_draw')"><div class="game-dot"></div> Quick, Draw!</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_scoville')"><div class="game-dot"></div> Scoville</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_loteria')"><div class="game-dot"></div> Lotería</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_hurdles')"><div class="game-dot"></div> Hurdles 2012</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_soccer')"><div class="game-dot"></div> Soccer 2012</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_basketball')"><div class="game-dot"></div> Basketball 2012</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_baseball')"><div class="game-dot"></div> Baseball</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_tennis')"><div class="game-dot"></div> Wimbledon Tennis</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_slalom')"><div class="game-dot"></div> Slalom Canoe</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_fischinger')"><div class="game-dot"></div> Fischinger Music</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_turing')"><div class="game-dot"></div> Alan Turing</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_snake')"><div class="game-dot"></div> Google Snake</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_earth_day')"><div class="game-dot"></div> Earth Day</div>
+        <div class="nav-item-game" onclick="loadGameFromLib('doodle_pangolin')"><div class="game-dot"></div> Save the Pangolin</div>
         <!-- ═══ ADD SIDEBAR LINKS FOR NEW GAMES HERE ═══
              Copy a line above and change the key + label. Example:
         <div class="nav-item-game featured" onclick="loadGameFromLib('slope')">
@@ -2735,6 +2785,30 @@
                                 <button class="btn-game btn-game-core red" onclick="loadGameFromLib('fnaeEpsteins')" style="grid-column:span 2;">
                                     <span class="btn-game-icon">👁️</span> Five Nights At Epstiens
                                 </button>
+                                <div style="grid-column:span 4;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-muted);padding:8px 4px 4px;">── GOOGLE DOODLES ──</div>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_pacman')" style="grid-column:span 2;"><span class="btn-game-icon">🟡</span> PAC-MAN Doodle</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_champion_island')" style="grid-column:span 2;"><span class="btn-game-icon">🏯</span> Champion Island</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_cricket')" style="grid-column:span 2;"><span class="btn-game-icon">🏏</span> Cricket</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_halloween2022')" style="grid-column:span 2;"><span class="btn-game-icon">👻</span> Great Ghoul Duel</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_halloween2018')" style="grid-column:span 2;"><span class="btn-game-icon">🎃</span> Halloween 2018</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_halloween2016')" style="grid-column:span 2;"><span class="btn-game-icon">🐱</span> Halloween 2016</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_garden')" style="grid-column:span 2;"><span class="btn-game-icon">🌱</span> Garden Gnomes</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_rubik')" style="grid-column:span 2;"><span class="btn-game-icon">🧊</span> Rubik's Cube</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_coding')" style="grid-column:span 2;"><span class="btn-game-icon">🐰</span> Coding for Carrots</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_quick_draw')" style="grid-column:span 2;"><span class="btn-game-icon">✏️</span> Quick, Draw!</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_scoville')" style="grid-column:span 2;"><span class="btn-game-icon">🌶️</span> Scoville</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_loteria')" style="grid-column:span 2;"><span class="btn-game-icon">🃏</span> Lotería</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_hurdles')" style="grid-column:span 2;"><span class="btn-game-icon">🏃</span> Hurdles 2012</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_soccer')" style="grid-column:span 2;"><span class="btn-game-icon">⚽</span> Soccer 2012</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_basketball')" style="grid-column:span 2;"><span class="btn-game-icon">🏀</span> Basketball 2012</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_baseball')" style="grid-column:span 2;"><span class="btn-game-icon">⚾</span> Baseball</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_tennis')" style="grid-column:span 2;"><span class="btn-game-icon">🎾</span> Wimbledon Tennis</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_slalom')" style="grid-column:span 2;"><span class="btn-game-icon">🛶</span> Slalom Canoe</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_fischinger')" style="grid-column:span 2;"><span class="btn-game-icon">🎵</span> Fischinger Music</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_turing')" style="grid-column:span 2;"><span class="btn-game-icon">💻</span> Alan Turing</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_snake')" style="grid-column:span 2;"><span class="btn-game-icon">🐍</span> Google Snake</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_earth_day')" style="grid-column:span 2;"><span class="btn-game-icon">🌍</span> Earth Day</button>
+                                <button class="btn-game btn-game-core" onclick="loadGameFromLib('doodle_pangolin')" style="grid-column:span 2;"><span class="btn-game-icon">🐾</span> Save the Pangolin</button>
                                 <!-- ═══ ADD OVERLAY BUTTONS FOR NEW GAMES HERE ═══
                                      Copy a btn-game line above and change the key + label. Example:
                                 <button class="btn-game btn-game-core" onclick="loadGameFromLib('slope')" style="grid-column:span 2;">
@@ -2749,7 +2823,7 @@
 
                 <div class="section-header">
                     <h2>Game Library</h2>
-                    <div class="section-tag">52 GAMES</div>
+                    <div class="section-tag">76 GAMES</div>
                 </div>
 
                 <div class="card-grid">
@@ -3263,6 +3337,239 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ── GOOGLE DOODLE GAMES ── -->
+                    <div style="grid-column:1/-1;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-muted);padding:16px 4px 8px;border-top:1px solid var(--border);margin-top:8px;">── GOOGLE DOODLES ──</div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_pacman')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a1a00,#2a2a00);">🟡</div>
+                        <div class="card-body">
+                            <div class="card-title">PAC-MAN (Google Doodle)</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_champion_island')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#0a001a,#15002a);">🏯</div>
+                        <div class="card-body">
+                            <div class="card-title">Doodle Champion Island</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_cricket')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#002200,#003300);">🏏</div>
+                        <div class="card-body">
+                            <div class="card-title">Cricket (Google Doodle)</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_halloween2022')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#100010,#1a0020);">👻</div>
+                        <div class="card-body">
+                            <div class="card-title">Great Ghoul Duel 2022</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_halloween2018')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#150800,#200c00);">🎃</div>
+                        <div class="card-body">
+                            <div class="card-title">Halloween Cat vs Ghosts</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_halloween2016')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a0800,#0a0015);">🐱</div>
+                        <div class="card-body">
+                            <div class="card-title">Halloween Magic Cat 2016</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_garden')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001500,#002500);">🌱</div>
+                        <div class="card-body">
+                            <div class="card-title">Garden Gnomes</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_rubik')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001a1a,#002a2a);">🧊</div>
+                        <div class="card-body">
+                            <div class="card-title">Rubik's Cube</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_coding')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001a00,#002800);">🐰</div>
+                        <div class="card-body">
+                            <div class="card-title">Coding for Carrots</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_quick_draw')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a1a1a,#2a2a2a);">✏️</div>
+                        <div class="card-body">
+                            <div class="card-title">Quick, Draw!</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_scoville')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a0000,#2a0000);">🌶️</div>
+                        <div class="card-body">
+                            <div class="card-title">Scoville</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_loteria')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a0000,#2a0010);">🃏</div>
+                        <div class="card-body">
+                            <div class="card-title">Lotería</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_hurdles')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#0a001a,#10002a);">🏃</div>
+                        <div class="card-body">
+                            <div class="card-title">London 2012 Hurdles</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_soccer')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#002200,#004400);">⚽</div>
+                        <div class="card-body">
+                            <div class="card-title">Soccer Euro 2012</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_basketball')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a0a00,#2a1000);">🏀</div>
+                        <div class="card-body">
+                            <div class="card-title">Basketball 2012</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_baseball')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#00001a,#00002a);">⚾</div>
+                        <div class="card-body">
+                            <div class="card-title">Baseball</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_tennis')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#1a1a00,#2a2200);">🎾</div>
+                        <div class="card-body">
+                            <div class="card-title">Wimbledon Tennis</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_slalom')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001a2a,#002a3a);">🛶</div>
+                        <div class="card-body">
+                            <div class="card-title">Slalom Canoe</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_fischinger')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#000a1a,#00102a);">🎵</div>
+                        <div class="card-body">
+                            <div class="card-title">Oskar Fischinger Music</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_turing')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#00001a,#00002a);">💻</div>
+                        <div class="card-body">
+                            <div class="card-title">Alan Turing Machine</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_snake')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001a00,#002200);">🐍</div>
+                        <div class="card-body">
+                            <div class="card-title">Google Doodle Snake</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_earth_day')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#001a0a,#002a10);">🌍</div>
+                        <div class="card-body">
+                            <div class="card-title">Earth Day</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-card" onclick="loadGameFromLib('doodle_pangolin')">
+                        <div class="card-thumb" style="background: linear-gradient(135deg,#0a1000,#101800);">🐾</div>
+                        <div class="card-body">
+                            <div class="card-title">Save the Pangolin</div>
+                            <div class="card-meta">
+                                <span class="badge badge-remote">DOODLE</span>
+                                <span class="card-xp">+12 XP</span>
+                            </div>
+                        </div>
+                    </div>
                     <!-- ═══ ADD GAME CARDS FOR NEW GAMES HERE ═══
                          Copy a game-card block above and change the key, emoji,
                          gradient colors, title, badge type, and XP. Example:
@@ -3450,6 +3757,10 @@
                             Rooms
                             <span class="gc-create-btn" onclick="openCreateGcModal()" title="Create Group">＋</span>
                         </div>
+                        <div class="gc-tabs">
+                            <button class="gc-tab-btn active" id="gctab-mine" onclick="switchGcTab('mine')">My Groups</button>
+                            <button class="gc-tab-btn" id="gctab-public" onclick="switchGcTab('public')">🌐 Public</button>
+                        </div>
                         <div class="gc-list" id="gc-list">
                             <div class="notif-empty" style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No group chats yet</div>
                         </div>
@@ -3511,6 +3822,11 @@
                     <div class="create-gc-title">Create Group Chat</div>
                     <label class="gc-form-label">Group Name</label>
                     <input class="gc-form-input" id="gc-name-input" placeholder="e.g. Snake Legends, Friday Night Gamers..." maxlength="40">
+                    <label class="gc-form-label">Visibility</label>
+                    <div class="gc-visibility-toggle">
+                        <button class="gc-vis-btn selected" id="vis-public" onclick="selectVisibility('public')">🌐 Public<br><span style="font-size:10px;font-weight:400;color:var(--text-muted)">Anyone can join</span></button>
+                        <button class="gc-vis-btn" id="vis-private" onclick="selectVisibility('private')">🔒 Private<br><span style="font-size:10px;font-weight:400;color:var(--text-muted)">Invite only</span></button>
+                    </div>
                     <label class="gc-form-label">Pick an Emoji Icon</label>
                     <div class="gc-emoji-row" id="gc-emoji-row">
                         <span class="gc-emoji-opt selected" onclick="selectGcEmoji(this,'🎮')">🎮</span>
@@ -3531,6 +3847,18 @@
                         <span class="gc-emoji-opt" onclick="selectGcEmoji(this,'🏅')">🏅</span>
                     </div>
                     <button class="btn-challenge" style="width:100%;border-radius:10px;padding:12px;" onclick="createGroupChat()">Create Group</button>
+                </div>
+            </div>
+
+            <!-- Invite to GC Modal -->
+            <div class="modal-overlay" id="invite-gc-modal">
+                <div class="invite-gc-modal">
+                    <button class="profile-modal-close" onclick="closeInviteGcModal()">✕</button>
+                    <div class="invite-gc-title">Invite to Group</div>
+                    <input class="gc-form-input" id="invite-gc-search" placeholder="Search players..." oninput="filterInviteUsers(this.value)" style="margin-bottom:12px;">
+                    <div class="invite-user-list" id="invite-user-list">
+                        <div class="notif-empty">Loading players...</div>
+                    </div>
                 </div>
             </div>
 
@@ -5376,13 +5704,32 @@
         // GROUP CHATS
         // ══════════════════════════════════════════════════════════════════
         let _gcCurrentId = null;
+        let _gcCurrentData = null;
         let _gcPollInterval = null;
         let _selectedGcEmoji = '🎮';
+        let _selectedVisibility = 'public';
+        let _gcTab = 'mine';
+        let _inviteGcId = null;
+        let _allPlayersForInvite = [];
 
         function selectGcEmoji(el, emoji) {
             document.querySelectorAll('.gc-emoji-opt').forEach(e => e.classList.remove('selected'));
             el.classList.add('selected');
             _selectedGcEmoji = emoji;
+        }
+
+        function selectVisibility(v) {
+            _selectedVisibility = v;
+            document.getElementById('vis-public').classList.toggle('selected', v === 'public');
+            document.getElementById('vis-private').classList.toggle('selected', v === 'private');
+        }
+
+        function switchGcTab(tab) {
+            _gcTab = tab;
+            document.getElementById('gctab-mine').classList.toggle('active', tab === 'mine');
+            document.getElementById('gctab-public').classList.toggle('active', tab === 'public');
+            if (tab === 'mine') loadGcList();
+            else loadPublicGcList();
         }
 
         function openCreateGcModal() {
@@ -5391,67 +5738,204 @@
         }
         function closeCreateGcModal() { document.getElementById('create-gc-modal').classList.remove('open'); }
 
+        function openInviteGcModal(gcId) {
+            _inviteGcId = gcId;
+            document.getElementById('invite-gc-modal').classList.add('open');
+            loadPlayersForInvite(gcId);
+        }
+        function closeInviteGcModal() { document.getElementById('invite-gc-modal').classList.remove('open'); }
+
+        async function loadPlayersForInvite(gcId) {
+            const el = document.getElementById('invite-user-list');
+            // Get current members
+            const { data: gc } = await sb.from('group_chats').select('members').eq('id', gcId).single();
+            const members = gc?.members || [];
+            // Get all players
+            const { data: players } = await sb.from('profiles').select('id,username,xp').order('xp', { ascending: false }).limit(50);
+            _allPlayersForInvite = (players || []).filter(p => p.id !== currentUser?.id);
+            renderInviteUserList(_allPlayersForInvite, members);
+        }
+
+        function renderInviteUserList(players, currentMembers) {
+            const el = document.getElementById('invite-user-list');
+            if (!players.length) { el.innerHTML = '<div class="notif-empty">No players found</div>'; return; }
+            el.innerHTML = players.map(p => {
+                const already = currentMembers.includes(p.id);
+                return `<div class="invite-user-item ${already ? 'already' : ''}">
+                    <div class="gc-msg-avatar" style="width:32px;height:32px;font-size:13px;">${(p.username||'?')[0].toUpperCase()}</div>
+                    <div style="flex:1;">
+                        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">${escHtml(p.username)}</div>
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--success);">${(p.xp||0).toLocaleString()} XP</div>
+                    </div>
+                    <button class="btn-invite-user" onclick="inviteToGc('${p.id}','${escHtml(p.username)}')" ${already ? 'disabled' : ''}>
+                        ${already ? '✓ In group' : 'Invite'}
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        function filterInviteUsers(q) {
+            const filtered = _allPlayersForInvite.filter(p => p.username.toLowerCase().includes(q.toLowerCase()));
+            // Re-render with current members unknown — simplify by passing []
+            renderInviteUserList(filtered, []);
+        }
+
+        async function inviteToGc(userId, username) {
+            if (!_inviteGcId) return;
+            // Add user to members array
+            const { data: gc } = await sb.from('group_chats').select('members').eq('id', _inviteGcId).single();
+            const members = gc?.members || [];
+            if (members.includes(userId)) { showToast('Already a member!'); return; }
+            members.push(userId);
+            const { error } = await sb.from('group_chats').update({ members }).eq('id', _inviteGcId);
+            if (error) { showToast('Failed to invite'); return; }
+            showToast(`✅ ${username} invited!`);
+            // Re-render invite list
+            loadPlayersForInvite(_inviteGcId);
+            // Refresh member panel if chat is open
+            if (_gcCurrentData) renderMemberPanel(_gcCurrentData);
+        }
+
         async function createGroupChat() {
             const name = document.getElementById('gc-name-input').value.trim();
             if (!name) { showToast('Give your group a name!'); return; }
             if (!currentUser) return;
-            const myName = window._currentUsername || currentUser.email.split('@')[0];
             const { data, error } = await sb.from('group_chats').insert({
-                name, emoji: _selectedGcEmoji,
+                name,
+                emoji: _selectedGcEmoji,
                 created_by: currentUser.id,
-                members: [currentUser.id]
+                members: [currentUser.id],
+                is_public: _selectedVisibility === 'public'
             }).select().single();
             if (error) { showToast('Error creating group: ' + error.message); return; }
             closeCreateGcModal();
             document.getElementById('gc-name-input').value = '';
             showToast(`👥 "${name}" created!`);
-            await loadGcList();
-            if (data) openGcChat(data.id, data.name, data.emoji);
+            switchGcTab('mine');
+            if (data) openGcChat(data);
+        }
+
+        async function joinPublicGroup(gcId) {
+            if (!currentUser) return;
+            const { data: gc } = await sb.from('group_chats').select('members,name').eq('id', gcId).single();
+            if (!gc) return;
+            const members = gc.members || [];
+            if (members.includes(currentUser.id)) {
+                // Already a member — just open it
+                const { data: full } = await sb.from('group_chats').select('*').eq('id', gcId).single();
+                if (full) openGcChat(full);
+                switchGcTab('mine');
+                return;
+            }
+            members.push(currentUser.id);
+            await sb.from('group_chats').update({ members }).eq('id', gcId);
+            showToast(`👥 Joined "${gc.name}"!`);
+            switchGcTab('mine');
+            const { data: full } = await sb.from('group_chats').select('*').eq('id', gcId).single();
+            if (full) openGcChat(full);
         }
 
         async function loadGcList() {
             if (!currentUser) return;
             const { data, error } = await sb.from('group_chats')
-                .select('id,name,emoji,created_at')
+                .select('*')
+                .contains('members', [currentUser.id])
                 .order('created_at', { ascending: false })
                 .limit(30);
             const el = document.getElementById('gc-list');
             if (error || !data || !data.length) {
-                el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No group chats yet.<br>Create one below!</div>';
+                el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">You\'re not in any groups yet.<br>Join a public one or create your own!</div>';
                 return;
             }
             el.innerHTML = data.map(gc => `
-                <div class="gc-item ${_gcCurrentId===gc.id?'active':''}" onclick="openGcChat('${gc.id}','${escHtml(gc.name)}','${gc.emoji||'🎮'}')">
+                <div class="gc-item ${_gcCurrentId===gc.id?'active':''}" onclick="(async()=>{const {data}=await sb.from('group_chats').select('*').eq('id','${gc.id}').single();if(data)openGcChat(data);})()">
                     <div class="gc-avatar">${gc.emoji||'🎮'}</div>
                     <div class="gc-info">
                         <div class="gc-name">${escHtml(gc.name)}</div>
-                        <div class="gc-preview">Tap to open</div>
+                        <div class="gc-preview">${gc.is_public?'🌐 Public':'🔒 Private'} · ${(gc.members||[]).length} members</div>
                     </div>
+                    <span class="gc-public-badge ${gc.is_public?'public':'private'}">${gc.is_public?'PUBLIC':'PRIVATE'}</span>
                 </div>`).join('');
         }
 
-        async function openGcChat(gcId, gcName, gcEmoji) {
-            _gcCurrentId = gcId;
+        async function loadPublicGcList() {
+            const { data, error } = await sb.from('group_chats')
+                .select('*')
+                .eq('is_public', true)
+                .order('created_at', { ascending: false })
+                .limit(50);
+            const el = document.getElementById('gc-list');
+            if (error || !data || !data.length) {
+                el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No public groups yet.<br>Be the first to create one!</div>';
+                return;
+            }
+            const myId = currentUser?.id;
+            el.innerHTML = data.map(gc => {
+                const isMember = myId && (gc.members||[]).includes(myId);
+                return `<div class="gc-item">
+                    <div class="gc-avatar">${gc.emoji||'🎮'}</div>
+                    <div class="gc-info">
+                        <div class="gc-name">${escHtml(gc.name)}</div>
+                        <div class="gc-preview">🌐 ${(gc.members||[]).length} members</div>
+                    </div>
+                    <button class="gc-join-btn ${isMember?'joined':''}" onclick="joinPublicGroup('${gc.id}')">
+                        ${isMember ? '✓ Joined' : 'Join'}
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        function renderMemberPanel(gc) {
+            const members = gc.members || [];
+            const isOwner = gc.created_by === currentUser?.id;
+            return `<div class="gc-members-panel">
+                <div class="gc-members-title">
+                    <span>${members.length} MEMBER${members.length!==1?'S':''}</span>
+                    ${!gc.is_public && isOwner ? `<button class="gc-invite-btn" onclick="openInviteGcModal('${gc.id}')">+ Invite</button>` : ''}
+                </div>
+                <div class="gc-member-chips">
+                    ${members.slice(0,12).map((_,i) => `<div class="gc-member-chip"><div class="gc-member-chip-avatar">?</div>Member</div>`).join('')}
+                    ${members.length > 12 ? `<div class="gc-member-chip">+${members.length-12} more</div>` : ''}
+                </div>
+            </div>`;
+        }
+
+        async function openGcChat(gc) {
+            _gcCurrentId = gc.id;
+            _gcCurrentData = gc;
             const pane = document.getElementById('gc-chat-pane');
+            const isPublic = gc.is_public;
+            const isOwner = gc.created_by === currentUser?.id;
+            const isMember = (gc.members||[]).includes(currentUser?.id);
+
+            // If private and not a member, block
+            if (!isPublic && !isMember) {
+                pane.innerHTML = `<div class="gc-empty-state"><div style="font-size:48px">🔒</div><div>This is a private group.<br>You need an invite to join.</div></div>`;
+                return;
+            }
+
             pane.innerHTML = `
                 <div class="gc-chat-header">
-                    <div class="gc-chat-avatar">${gcEmoji||'🎮'}</div>
-                    <div class="gc-chat-name">${escHtml(gcName)}</div>
-                    <div class="gc-member-count" id="gc-member-count">Group Chat</div>
+                    <div class="gc-chat-avatar">${gc.emoji||'🎮'}</div>
+                    <div class="gc-chat-name">${escHtml(gc.name)}</div>
+                    <span class="gc-public-badge ${isPublic?'public':'private'}" style="margin-left:4px;">${isPublic?'PUBLIC':'PRIVATE'}</span>
+                    <div style="flex:1;"></div>
+                    ${!isPublic && isOwner ? `<button class="gc-invite-btn" onclick="openInviteGcModal('${gc.id}')">+ Invite</button>` : ''}
                 </div>
-                <div class="gc-messages" id="gc-messages-${gcId}"><div class="feed-loading">LOADING...</div></div>
+                ${renderMemberPanel(gc)}
+                <div class="gc-messages" id="gc-messages-${gc.id}"><div class="feed-loading">LOADING...</div></div>
                 <div class="gc-composer">
-                    <input class="gc-input" id="gc-input-${gcId}" placeholder="Message the group..." maxlength="500"
-                        onkeydown="if(event.key==='Enter')sendGcMessage('${gcId}')">
-                    <button class="gc-send-btn" onclick="sendGcMessage('${gcId}')">Send</button>
+                    <input class="gc-input" id="gc-input-${gc.id}" placeholder="Message the group..." maxlength="500"
+                        onkeydown="if(event.key==='Enter')sendGcMessage('${gc.id}')">
+                    <button class="gc-send-btn" onclick="sendGcMessage('${gc.id}')">Send</button>
                 </div>`;
-            await loadGcMessages(gcId);
+
+            await loadGcMessages(gc.id);
             if (_gcPollInterval) clearInterval(_gcPollInterval);
-            _gcPollInterval = setInterval(() => loadGcMessages(gcId), 5000);
-            // Update sidebar active state
-            document.querySelectorAll('.gc-item').forEach(el => {
-                el.classList.toggle('active', el.getAttribute('onclick') && el.getAttribute('onclick').includes(gcId));
-            });
+            _gcPollInterval = setInterval(() => loadGcMessages(gc.id), 5000);
+
+            // Update sidebar active
+            document.querySelectorAll('.gc-item').forEach(el => el.classList.remove('active'));
         }
 
         async function loadGcMessages(gcId) {
@@ -5462,7 +5946,7 @@
             if (!el) return;
             const myId = currentUser?.id || 'ghost';
             if (!data || !data.length) {
-                el.innerHTML = '<div style="margin:auto;text-align:center;color:var(--text-muted);font-size:13px;">No messages yet — say something! 👋</div>';
+                el.innerHTML = '<div style="margin:auto;text-align:center;color:var(--text-muted);font-size:13px;padding:24px;">No messages yet — say something! 👋</div>';
                 return;
             }
             el.innerHTML = data.map(msg => {
@@ -5499,7 +5983,7 @@
                 document.getElementById('gc-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">Log in to join group chats</div>';
                 return;
             }
-            await loadGcList();
+            switchGcTab('mine');
         }
 
         // ══════════════════════════════════════════════════════════════════
