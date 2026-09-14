@@ -2613,3 +2613,4 @@ motocrossx3m: {
         url: "https://db2.duckmath.org/2026/more/duckcraft/pre.html"
     },
 };
+window.GamesLib = GamesLib;
