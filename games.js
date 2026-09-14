@@ -2611,4 +2611,5 @@ motocrossx3m: {
         emoji: "🧱",
         color: "linear-gradient(135deg, #0a0000, #1a0000",
         url: "https://db2.duckmath.org/2026/more/duckcraft/pre.html"
+    },
 };
