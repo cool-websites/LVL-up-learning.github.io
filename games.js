@@ -2634,13 +2634,13 @@ motocrossx3m: {
 
     },
 
-    : {
-        title: "retro bowl",
+    fnaf: {
+        title: "fnaf",
         type: "remote",
         xpMultiplier: 15,
         emoji: "🏈",
         color: "linear-gradient(135deg, #0a0000, #1a0000",
-        url: "https://cool-websites.github.io/retro-bowl/"
+        url: "https://cool-websites.github.io/fnaf/"
 
     },
 };
