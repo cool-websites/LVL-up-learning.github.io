@@ -2612,5 +2612,36 @@ motocrossx3m: {
         color: "linear-gradient(135deg, #0a0000, #1a0000",
         url: "https://db2.duckmath.org/2026/more/duckcraft/pre.html"
     },
+
+    bitlife: {
+        title: "bitlife",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "ᯡ",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://cool-websites.github.io/bitlife/"
+
+    },
+
+    
+    retrobowl: {
+        title: "retro bowl",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "🏈",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://cool-websites.github.io/retro-bowl/"
+
+    },
+
+    : {
+        title: "retro bowl",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "🏈",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://cool-websites.github.io/retro-bowl/"
+
+    },
 };
 window.GamesLib = GamesLib;
