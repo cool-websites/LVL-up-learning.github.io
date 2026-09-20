@@ -16,7 +16,7 @@
 //  REMOTE GAME TEMPLATE (easiest — just paste a URL):
 //
 //    myGameKey: {
-//        title: "My Game Title",      // shown in the header
+//        title: "My Game Title",      // shown in the header                   
 //        type: "remote",
 //        xpMultiplier: 10,            // XP awarded when the player exits
 //        emoji: "🎮",                 // shown on the card thumbnail
@@ -2638,7 +2638,7 @@ motocrossx3m: {
         title: "fnaf",
         type: "remote",
         xpMultiplier: 15,
-        emoji: "🏈",
+        emoji: "🐻",
         color: "linear-gradient(135deg, #0a0000, #1a0000",
         url: "https://cool-websites.github.io/fnaf/"
 
