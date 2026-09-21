@@ -2643,5 +2643,25 @@ motocrossx3m: {
         url: "https://cool-websites.github.io/fnaf/"
 
     },
+    
+    fued: {
+        title: "google fued",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "G",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://cool-websites.github.io/google-fued/"
+
+    },
+
+    subwaysurfers: {
+        title: "subway surfurs",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "G",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://cool-websites.github.io/ss-san-fransisco/"
+
+    },
 };
 window.GamesLib = GamesLib;
