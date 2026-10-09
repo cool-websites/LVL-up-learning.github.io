@@ -3718,15 +3718,13 @@
     <div id="toast"></div>
 
     <!-- GAMES LIBRARY -->
+    <script src="config.js"></script>
     <script src="games.js"></script>
 
     <script>
         // ── Supabase ──────────────────────────────────────────────────────────
         const { createClient } = supabase;
-        const sb = createClient(
-            'https://pzmfsbajmntwvvvxdlra.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWZzYmFqbW50d3Z2dnhkbHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTUyOTEsImV4cCI6MjA5MjEzMTI5MX0.VSX10eIB7abkAgjh1Bf3WDFfOm8vmMEqS1LVDkuopZE'
-        );
+        const sb = createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
         window.sb = sb; // expose globally for games.js party system
         emailjs.init("jrgaySZUJkXugz5TV");
 
