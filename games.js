@@ -2663,5 +2663,15 @@ motocrossx3m: {
         url: "https://cool-websites.github.io/ss-san-fransisco/"
 
     },
+
+    oregan: {
+        title: "oregan trail",
+        type: "remote",
+        xpMultiplier: 15,
+        emoji: "G",
+        color: "linear-gradient(135deg, #0a0000, #1a0000",
+        url: "https://archive.org/embed/oregon-trail-the-1990_202208"
+
+    },
 };
 window.GamesLib = GamesLib;
