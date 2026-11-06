@@ -2319,7 +2319,6 @@ motocrossx3m: {
         url: "https://cool-websites.github.io/ss-san-fransisco/"
 
     },
-<<<<<<< HEAD
 
     oregan: {
         title: "oregan trail",
@@ -2330,8 +2329,5 @@ motocrossx3m: {
         url: "https://archive.org/embed/oregon-trail-the-1990_202208"
 
     },
-=======
-    
->>>>>>> 22e6bd8798c530b7622e092d9a59bcd8859f5889
 };
 window.GamesLib = GamesLib;
